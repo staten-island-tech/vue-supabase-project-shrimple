@@ -11,12 +11,25 @@
         shrimple
       </button>
     </div>
+    <p v-for="country in countries">{{ country }}</p>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import type { Ref } from "vue";
+import { ref, onMounted } from "vue";
 const counter = ref(1);
+import { supabase } from "../../utils/supabase";
+const countries: Ref<Array<any> | null> = ref([]);
+
+async function getCountries() {
+  const { data } = await supabase.from("countries").select();
+  countries.value = data;
+}
+
+onMounted(() => {
+  getCountries();
+});
 </script>
 
 <style scoped></style>
