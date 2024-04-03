@@ -17,16 +17,19 @@ export const useCartStore = defineStore("cart", () => {
   }
 
   async function createCart() {
-    await supabase.from("carts").insert({ data: "" });
+    const user = await userStore.user;
+    if (!user.data.user) return;
+    console.log("creating cart");
+    await supabase.from("carts").insert({ id: user.data.user.id });
   }
 
   async function fetchCart() {
-    console.log("STart");
     const user = await userStore.user;
     console.log(user);
     if (!user || !user.data.user) return;
 
-    const dbCart = await supabase.from("carts").select("data").eq("id", user.data.user.id);
+    const dbCart = await supabase.from("carts").select("data");
+    console.log(dbCart);
 
     if (!dbCart.data || dbCart.data.length === 0) {
       await createCart();
@@ -42,7 +45,7 @@ export const useCartStore = defineStore("cart", () => {
     console.log("saving", cart);
     const user = await userStore.user;
     if (!user || user.data.user?.aud !== "authenticated") {
-      alert("You are not signed in!! Anonymous carts maybe coming later...");
+      alert("You are not signed in somehow??");
       return;
     }
 

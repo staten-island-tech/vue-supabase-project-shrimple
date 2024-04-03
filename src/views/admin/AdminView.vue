@@ -17,7 +17,7 @@ const loaded = ref(false);
 const error = ref("");
 
 onMounted(async () => {
-  const admin = await userStore.isAdmin();
+  const admin = await userStore.isAdmin;
   if (!admin) {
     error.value = "You're not supposed to be here.";
     return;

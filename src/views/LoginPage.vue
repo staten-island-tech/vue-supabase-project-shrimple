@@ -19,8 +19,7 @@ const user = ref();
 
 onMounted(async () => {
   user.value = await userStore.user;
-  console.log(user.value);
-  signedIn.value = user.value.data.user.user_metadata.name;
+  if (user.value) signedIn.value = user.value.data.user.user_metadata.name;
 });
 </script>
 
