@@ -41,6 +41,12 @@ export const useCartStore = defineStore("cart", () => {
     const session = await userStore.getSession();
     if (!session.data.session) return;
 
+    for (const [key, value] of Object.entries(cart)) {
+      if (value === 0) {
+        delete cart[key];
+      }
+    }
+
     await supabase
       .from("carts")
       .update({ data: JSON.stringify(cart) })

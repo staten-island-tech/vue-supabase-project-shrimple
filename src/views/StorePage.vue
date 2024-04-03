@@ -1,10 +1,10 @@
 <template>
   <h1 class="text-xl underline text-center">as shrimple as that</h1>
   <RouterLink to="/"><p class="text-center">go home</p></RouterLink>
-  <div class="flex items-center justify-around">
-    <ItemCard v-if="loaded" v-for="item in items" :item="item" />
-    <p v-else>please wait...</p>
+  <div class="flex items-center justify-around" v-if="loaded">
+    <ItemCard v-for="item in items" :item="item" :key="item.id" />
   </div>
+  <p v-else class="text-align">please wait...</p>
   <RouterLink to="/cart"><p class="text-center">view cart</p></RouterLink>
 </template>
 
