@@ -4,7 +4,6 @@
   <div class="flex flex-col gap-2 items-center" v-if="session">
     <button @click="userStore.signIn" v-if="!session.data.session">login</button>
     <button @click="userStore.signOut" v-if="session.data.session">logout</button>
-    <!-- <button @click="log">log data</button> -->
   </div>
   <RouterLink to="/"><p class="text-center">go home</p></RouterLink>
 </template>
@@ -20,12 +19,6 @@ onMounted(async () => {
   session.value = await userStore.getSession();
   display.value = session.value.data.session ? `you are signed in as ${session.value.data.session.user.user_metadata.name}` : "you aren't signed in";
 });
-
-import { supabase } from "/utils/supabase";
-async function log() {
-  console.log(await supabase.auth.getSession());
-  console.log(await supabase.auth.getUser());
-}
 </script>
 
 <style scoped></style>

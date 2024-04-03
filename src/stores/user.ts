@@ -21,5 +21,14 @@ export const useUserStore = defineStore("user", () => {
     return await supabase.auth.getSession();
   }
 
-  return { signIn, signOut, getSession };
+  async function isAdmin() {
+    const session = await getSession();
+    if (!session.data.session) return false;
+
+    const response = await supabase.from("admins").select().eq("id", session.data.session.user.id);
+    if (!response.data) return false;
+    return response.data.length > 0;
+  }
+
+  return { signIn, signOut, getSession, isAdmin };
 });

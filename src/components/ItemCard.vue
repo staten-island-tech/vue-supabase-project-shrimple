@@ -1,9 +1,9 @@
 <template>
-  <div class="bg-slate-200 w-1/3 h-1/3 p-4 border border-black flex flex-col">
-    <h2>{{ props.item.name }}</h2>
-    <h2>${{ props.item.price }}</h2>
-    <p>{{ props.item.description }}</p>
-    <p>{{ props.item.stock }} left in stock</p>
+  <div class="bg-slate-200 w-1/3 h-1/3 p-4 border border-black flex flex-col cursor-pointer" @click="go">
+    <h2 class="text-lg">{{ props.item.name }}</h2>
+    <h2 class="font-mono">${{ props.item.price }}</h2>
+    <img :src="props.item.image" />
+    <code>{{ props.item.id }}</code>
   </div>
 </template>
 
@@ -17,6 +17,10 @@ const props = defineProps({
     required: true,
   },
 });
+
+function go() {
+  window.location.assign(`${window.location.origin}/item/${props.item.id}?${props.item.name}`);
+}
 </script>
 
 <style scoped></style>
