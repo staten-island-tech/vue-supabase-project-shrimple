@@ -20,7 +20,7 @@ const user = ref();
 onMounted(async () => {
   user.value = await userStore.user;
   console.log(user.value);
-  signedIn.value = user.value && user.value.data.user && user.value.data.user.aud === "authenticated";
+  signedIn.value = user.value.data.user.user_metadata.name;
 });
 </script>
 

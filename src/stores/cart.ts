@@ -22,10 +22,11 @@ export const useCartStore = defineStore("cart", () => {
 
   async function fetchCart() {
     console.log("STart");
-    const session = await userStore.getSession();
-    if (!session.data.session) return;
+    const user = await userStore.user;
+    console.log(user);
+    if (!user || !user.data.user) return;
 
-    const dbCart = await supabase.from("carts").select("data").eq("id", session.data.session.user.id);
+    const dbCart = await supabase.from("carts").select("data").eq("id", user.data.user.id);
 
     if (!dbCart.data || dbCart.data.length === 0) {
       await createCart();
@@ -39,8 +40,11 @@ export const useCartStore = defineStore("cart", () => {
 
   async function saveCart() {
     console.log("saving", cart);
-    const session = await userStore.getSession();
-    if (!session.data.session) return;
+    const user = await userStore.user;
+    if (!user || user.data.user?.aud !== "authenticated") {
+      alert("You are not signed in!! Anonymous carts maybe coming later...");
+      return;
+    }
 
     for (const [key, value] of Object.entries(cart)) {
       if (value === 0) {
@@ -51,7 +55,7 @@ export const useCartStore = defineStore("cart", () => {
     await supabase
       .from("carts")
       .update({ data: JSON.stringify(cart) })
-      .eq("id", session.data.session.user.id);
+      .eq("id", user.data.user.id);
     console.log("just saved", cart);
   }
 
