@@ -19,7 +19,7 @@ import { RouterLink } from "vue-router";
 import { supabase } from "../../utils/supabase";
 import type { Item } from "../types/interface";
 import type { Ref } from "vue";
-import { ref, defineProps, onMounted } from "vue";
+import { ref, onMounted } from "vue";
 const props = defineProps({
   id: {
     type: String,

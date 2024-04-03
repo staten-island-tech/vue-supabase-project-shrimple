@@ -21,6 +21,7 @@ export const useCartStore = defineStore("cart", () => {
   }
 
   async function fetchCart() {
+    console.log("STart");
     const session = await userStore.getSession();
     if (!session.data.session) return;
 
@@ -30,7 +31,7 @@ export const useCartStore = defineStore("cart", () => {
       await createCart();
       cart = {};
     } else {
-      cart = JSON.parse(dbCart.data![0].data);
+      cart = JSON.parse(dbCart.data[0].data);
     }
 
     console.log("fetched", cart);
