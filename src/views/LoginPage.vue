@@ -1,9 +1,11 @@
 <template>
   <h1 class="text-center text-xl underline">amazing login page</h1>
-  <p class="text-center">{{ display }}</p>
-  <div class="flex flex-col gap-2 items-center" v-if="session">
-    <button @click="userStore.signIn" v-if="!session.data.session">login</button>
-    <button @click="userStore.signOut" v-if="session.data.session">logout</button>
+  <div v-if="user">
+    <p class="text-center">{{ signedIn ? `you are signed in as ${user.data.user.user_metadata.name}` : "you aren't signed in" }}</p>
+    <div class="flex flex-col gap-2 items-center">
+      <button @click="userStore.signIn" v-if="!signedIn">login</button>
+      <button @click="userStore.signOut" v-if="signedIn">logout</button>
+    </div>
   </div>
   <RouterLink to="/"><p class="text-center">go home</p></RouterLink>
 </template>
@@ -12,12 +14,13 @@
 import { onMounted, reactive, ref } from "vue";
 import { useUserStore } from "../stores/user";
 const userStore = useUserStore();
-const display = ref("");
-const session = ref();
+const signedIn = ref(false);
+const user = ref();
 
 onMounted(async () => {
-  session.value = await userStore.getSession();
-  display.value = session.value.data.session ? `you are signed in as ${session.value.data.session.user.user_metadata.name}` : "you aren't signed in";
+  user.value = await userStore.user;
+  console.log(user.value);
+  signedIn.value = user.value && user.value.data.user && user.value.data.user.aud === "authenticated";
 });
 </script>
 

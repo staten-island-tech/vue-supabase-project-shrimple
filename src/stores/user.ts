@@ -1,8 +1,24 @@
-import { ref, computed } from "vue";
+import { computed } from "vue";
 import { defineStore } from "pinia";
 import { supabase } from "../../utils/supabase";
 
 export const useUserStore = defineStore("user", () => {
+  let dbUser;
+
+  const user = computed(async () => {
+    dbUser ??= await supabase.auth.getUser();
+    return dbUser;
+  });
+
+  const isAdmin = computed(async () => {
+    if (!dbUser || dbUser.data.user.aud !== "authenticated") {
+      return false;
+    }
+    const response = await supabase.from("admins").select().eq("id", dbUser.data.user.id);
+    if (!response.data) return false;
+    return response.data.length > 0;
+  });
+
   async function signIn() {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
@@ -14,21 +30,9 @@ export const useUserStore = defineStore("user", () => {
 
   async function signOut() {
     const { error } = await supabase.auth.signOut({ scope: "local" });
+    localStorage.clear();
     window.location.reload();
   }
 
-  async function getSession() {
-    return await supabase.auth.getSession();
-  }
-
-  async function isAdmin() {
-    const session = await getSession();
-    if (!session.data.session) return false;
-
-    const response = await supabase.from("admins").select().eq("id", session.data.session.user.id);
-    if (!response.data) return false;
-    return response.data.length > 0;
-  }
-
-  return { signIn, signOut, getSession, isAdmin };
+  return { user, signIn, signOut, isAdmin };
 });
