@@ -1,6 +1,6 @@
 <template>
   <h1 class="text-center text-xl underline">amazing login page</h1>
-  <div v-if="user">
+  <div>
     <p class="text-center">{{ signedIn ? `you are signed in as ${user.data.user.user_metadata.name}` : "you aren't signed in" }}</p>
     <div class="flex flex-col gap-2 items-center">
       <button @click="userStore.signIn" v-if="!signedIn">login</button>

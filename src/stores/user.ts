@@ -5,10 +5,7 @@ import { supabase } from "../../utils/supabase";
 export const useUserStore = defineStore("user", () => {
   let dbUser;
 
-  const user = computed(async () => {
-    dbUser ??= await supabase.auth.getUser();
-    return dbUser;
-  });
+  const user = computed(() => dbUser);
 
   const isAdmin = computed(async () => {
     if (!dbUser || dbUser.data.user.aud !== "authenticated") {
@@ -26,6 +23,7 @@ export const useUserStore = defineStore("user", () => {
         redirectTo: window.location.href,
       },
     });
+    dbUser ??= await supabase.auth.getUser();
   }
 
   async function signOut() {

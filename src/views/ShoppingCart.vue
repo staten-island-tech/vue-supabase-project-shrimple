@@ -8,7 +8,6 @@
 </template>
 
 <script setup lang="ts">
-import { supabase } from "../../utils/supabase";
 import { useCartStore } from "@/stores/cart";
 import { ref, onMounted } from "vue";
 const cartStore = useCartStore();
