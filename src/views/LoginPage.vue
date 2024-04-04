@@ -4,7 +4,7 @@
     <p>{{ signedIn ? `you are signed in as ${signedIn}` : "you aren't signed in" }}</p>
     <div class="flex flex-col gap-1">
       <button @click="userStore.anonToUser" v-if="!signedIn">CREATE ACCOUNT</button>
-      <button @click="userStore.signIn" v-if="!signedIn">LOGIN</button>
+      <button @click="signIn" v-if="!signedIn">LOGIN</button>
       <button @click="userStore.signOut" v-if="signedIn">logout</button>
     </div>
     <details class="bg-slate-200 p-4 rounded-md w-4/5" v-if="!signedIn">
@@ -31,6 +31,8 @@ import type { Ref } from "vue";
 import { useUserStore } from "../stores/user";
 import { useCartStore } from "../stores/cart";
 import type { UserResponse } from "@supabase/supabase-js";
+import type { cart } from "@/types/interface";
+
 const userStore = useUserStore();
 const cartStore = useCartStore();
 const signedIn = ref(false);
@@ -42,9 +44,39 @@ onMounted(async () => {
   if (user.value.data.user?.identities && user.value.data.user.identities[0]) {
     signedIn.value = user.value.data.user.identities[0].identity_data ? user.value.data.user.identities[0].identity_data.name : "Mario from Mario Bros.";
   }
+  const url = new URL(window.location.href);
+  const params = url.searchParams;
+  if (!signedIn.value && params.get("error_code") === "422") {
+    // user failed sign in (anontouser instead of login)
+    alert("your sign in failed... try logging in instead");
+    window.location.assign(url.origin + url.pathname);
+  }
   await cartStore.fetchCart(false);
+  const storedCart = localStorage.getItem("cart");
+  localStorage.removeItem("cart");
+  if (signedIn.value && storedCart) {
+    const parsedCart = JSON.parse(storedCart) as cart;
+    const dbCart = cartStore.shoppingCart();
+    const length = Object.keys(parsedCart).length;
+    if (length) {
+      const prompt = confirm(
+        `
+        You had ${length} item${length === 1 ? "" : "s"} in your cart before signing in.
+        Would you like to overwrite your current cart (${Object.keys(dbCart).length} item${Object.keys(dbCart).length === 1 ? "" : "s"}) with these items?
+        `
+      );
+      if (prompt) {
+        await cartStore.setCart(parsedCart);
+      }
+    }
+  }
   length.value = Object.keys(cartStore.shoppingCart()).length;
 });
+
+async function signIn() {
+  localStorage.setItem("cart", JSON.stringify(cartStore.shoppingCart()));
+  await userStore.signIn();
+}
 </script>
 
 <style scoped></style>

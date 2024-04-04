@@ -2,12 +2,21 @@ import { reactive, computed } from "vue";
 import { defineStore } from "pinia";
 import { supabase } from "../../utils/supabase";
 import { useUserStore } from "./user";
+import type { cart } from "@/types/interface";
 const userStore = useUserStore();
 
 export const useCartStore = defineStore("cart", () => {
-  let cart: { [key: string]: number } = reactive({});
+  let cart: cart = reactive({});
   function shoppingCart() {
     return cart;
+  }
+
+  async function createCart() {
+    const user = await userStore.user;
+    if (!user.data.user) return;
+    console.log("creating cart");
+    // if id already has a cart this won't error. cool!
+    await supabase.from("carts").insert({ id: user.data.user.id });
   }
 
   async function addToCart(id: string, amount: number) {
@@ -18,11 +27,9 @@ export const useCartStore = defineStore("cart", () => {
     await saveCart();
   }
 
-  async function createCart() {
-    const user = await userStore.user;
-    if (!user.data.user) return;
-    console.log("creating cart");
-    await supabase.from("carts").insert({ id: user.data.user.id });
+  async function setCart(c: cart) {
+    cart = c;
+    await saveCart();
   }
 
   async function fetchCart(force: boolean) {
@@ -66,5 +73,5 @@ export const useCartStore = defineStore("cart", () => {
     console.log("just saved", cart);
   }
 
-  return { shoppingCart, addToCart, fetchCart, saveCart };
+  return { shoppingCart, setCart, addToCart, fetchCart, saveCart };
 });

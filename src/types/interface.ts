@@ -6,3 +6,7 @@ export interface Item {
   stock: number;
   image: string;
 }
+
+export interface cart {
+  [key: string]: number;
+}
