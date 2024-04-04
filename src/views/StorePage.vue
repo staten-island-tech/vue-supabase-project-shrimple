@@ -1,11 +1,11 @@
 <template>
   <h1 class="text-xl underline text-center">as shrimple as that</h1>
-  <RouterLink to="/"><p class="text-center">go home</p></RouterLink>
-  <div class="flex items-center justify-around" v-if="loaded">
-    <ItemCard v-for="item in items" :item="item" :key="item.id" />
+  <div class="flex justify-center w-full">
+    <div class="flex flex-wrap justify-around gap-4 w-4/5" v-if="loaded">
+      <ItemCard v-for="item in items" :item="item" :key="item.id" class="flex-grow" />
+    </div>
+    <p v-else>please wait...</p>
   </div>
-  <p v-else class="text-align">please wait...</p>
-  <RouterLink to="/cart"><p class="text-center">view cart</p></RouterLink>
 </template>
 
 <script setup lang="ts">

@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-slate-200 w-1/3 h-1/3 p-4 border border-black flex flex-col cursor-pointer" @click="go">
+  <div class="bg-slate-200 p-4 border border-black flex flex-col cursor-pointer" @click="go">
     <h2 class="text-lg">{{ props.item.name }}</h2>
     <h2 class="font-mono">${{ props.item.price }}</h2>
     <img :src="props.item.image" />

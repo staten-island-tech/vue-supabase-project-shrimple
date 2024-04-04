@@ -34,6 +34,16 @@ export const useUserStore = defineStore("user", () => {
     return response.data.length > 0;
   });
 
+  async function anonToUser() {
+    const { data, error } = await supabase.auth.linkIdentity({
+      provider: "google",
+      options: {
+        redirectTo: window.location.href,
+      },
+    });
+    if (data && !error) dbUser = await supabase.auth.getUser();
+  }
+
   async function signIn() {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
@@ -50,5 +60,5 @@ export const useUserStore = defineStore("user", () => {
     window.location.reload();
   }
 
-  return { user, signIn, signOut, isAdmin };
+  return { user, anonToUser, signIn, signOut, isAdmin };
 });

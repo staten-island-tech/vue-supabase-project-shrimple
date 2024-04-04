@@ -5,12 +5,14 @@ import { useUserStore } from "./user";
 const userStore = useUserStore();
 
 export const useCartStore = defineStore("cart", () => {
-  let cart: { [key: string]: number } = {};
-  const shoppingCart = computed(() => cart);
+  let cart: { [key: string]: number } = reactive({});
+  function shoppingCart() {
+    return cart;
+  }
 
   async function addToCart(id: string, amount: number) {
     console.log("add");
-    await fetchCart();
+    await fetchCart(true);
     cart[id] ??= 0;
     cart[id] += amount;
     await saveCart();
@@ -23,10 +25,12 @@ export const useCartStore = defineStore("cart", () => {
     await supabase.from("carts").insert({ id: user.data.user.id });
   }
 
-  async function fetchCart() {
+  async function fetchCart(force: boolean) {
     const user = await userStore.user;
-    console.log(user);
     if (!user || !user.data.user) return;
+
+    // an attempt to cache the cart. stuff like loginpage should already have a fetched cart (you just signed in), so don't make another api call
+    if (!force && Object.keys(cart).length > 0) return;
 
     const dbCart = await supabase.from("carts").select("data");
     console.log(dbCart);

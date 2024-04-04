@@ -1,5 +1,4 @@
 <template>
-  <RouterLink to="/store">go back to the store</RouterLink>
   <div v-if="loaded && item">
     <h1 class="text-lg">{{ item.name }}</h1>
     <h2 class="font-mono">${{ item.price }}</h2>
