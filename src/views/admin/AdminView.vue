@@ -1,6 +1,5 @@
 <template>
   <div>
-    <RouterLink to="/"><p class="text-center">go home</p></RouterLink>
     <div v-if="loaded" class="flex flex-col items-center">
       <h1 class="font-bold text-lg">welcome to the admin page</h1>
       <RouterLink to="/admin/edit"><p>edit listings</p></RouterLink>
@@ -28,4 +27,3 @@ onMounted(async () => {
 </script>
 
 <style scoped></style>
-../../../utils/supabase
