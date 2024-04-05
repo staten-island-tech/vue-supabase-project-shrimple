@@ -1,7 +1,7 @@
 <template>
   <div v-if="loaded" class="flex flex-col items-center p-2 gap-2 w-full">
     <EditCard v-for="item in items" :key="item.id" :item="item" class="w-full" @update="updateItem" @del="deleteItem" />
-    <button @click="add">ADD CARD</button>
+    <button @click="add">ADD ITEM</button>
   </div>
 </template>
 
@@ -10,7 +10,7 @@ import { supabase } from "../../../utils/supabase";
 import { ref, onMounted } from "vue";
 import type { Ref } from "vue";
 import type { Item } from "@/types/interface";
-import EditCard from "../../components/EditCard.vue";
+import EditCard from "../../components/admin/EditCard.vue";
 let items: Ref<Array<Item>> = ref([]);
 
 const loaded = ref(false);

@@ -1,3 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.button,
+button {
+  @apply bg-slate-100 w-fit p-1.5 border border-black cursor-pointer hover:bg-slate-300 transition-colors duration-200 ease-linear;
+}

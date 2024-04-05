@@ -29,7 +29,7 @@ onMounted(async () => {
 
 <style scoped>
 span {
-  @apply border-r border-r-black pr-4 font-serif place-self-center;
+  @apply border-r border-r-black pr-4 font-serif h-full;
 }
 span:last-of-type {
   @apply border-none;
