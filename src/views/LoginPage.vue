@@ -31,32 +31,38 @@ import type { Ref } from "vue";
 import { useUserStore } from "../stores/user";
 import { useCartStore } from "../stores/cart";
 import type { UserResponse } from "@supabase/supabase-js";
-import type { cart } from "@/types/interface";
+import type { Cart } from "@/types/interface";
+import { storeToRefs } from "pinia";
 
 const userStore = useUserStore();
 const cartStore = useCartStore();
 const signedIn = ref(false);
 const length = ref(0);
 const user: Ref<UserResponse | undefined> = ref();
+const { cart } = storeToRefs(cartStore);
 
 onMounted(async () => {
   user.value = await userStore.user;
   if (user.value.data.user?.identities && user.value.data.user.identities[0]) {
     signedIn.value = user.value.data.user.identities[0].identity_data ? user.value.data.user.identities[0].identity_data.name : "Mario from Mario Bros.";
   }
+
   const url = new URL(window.location.href);
   const params = url.searchParams;
   if (!signedIn.value && params.get("error_code") === "422") {
     // user failed sign in (anontouser instead of login)
     alert("your sign in failed... try logging in instead");
     window.location.assign(url.origin + url.pathname);
+    return;
   }
-  await cartStore.fetchCart(false);
+
+  await cartStore.fetchCart();
   const storedCart = localStorage.getItem("cart");
-  localStorage.removeItem("cart");
+  if (storedCart) localStorage.removeItem("cart");
   if (signedIn.value && storedCart) {
-    const parsedCart = JSON.parse(storedCart) as cart;
-    const dbCart = cartStore.shoppingCart();
+    const parsedCart = JSON.parse(storedCart) as Cart;
+    await cartStore.fetchCart();
+    const dbCart = cart.value;
     const length = Object.keys(parsedCart).length;
     if (length) {
       const prompt = confirm(
@@ -66,15 +72,16 @@ onMounted(async () => {
         `
       );
       if (prompt) {
-        await cartStore.setCart(parsedCart);
+        cart.value = parsedCart;
+        await cartStore.saveCart();
       }
     }
   }
-  length.value = Object.keys(cartStore.shoppingCart()).length;
+  length.value = Object.keys(cart.value).length;
 });
 
 async function signIn() {
-  localStorage.setItem("cart", JSON.stringify(cartStore.shoppingCart()));
+  localStorage.setItem("cart", JSON.stringify(cart.value));
   await userStore.signIn();
 }
 </script>

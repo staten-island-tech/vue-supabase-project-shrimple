@@ -19,23 +19,22 @@ import { useCartStore } from "@/stores/cart";
 import type { Ref } from "vue";
 import { ref, onMounted } from "vue";
 import type { UserResponse } from "@supabase/supabase-js";
+import { storeToRefs } from "pinia";
 const userStore = useUserStore();
 const cartStore = useCartStore();
 
 const loaded = ref(false);
 const error = ref("");
-const cart = ref();
+const { cart } = storeToRefs(cartStore);
 const user: Ref<UserResponse | undefined> = ref(undefined);
 
 onMounted(async () => {
-  console.log("BLAU");
   user.value = await userStore.user;
-  await cartStore.fetchCart(true);
-  if (!cartStore.shoppingCart()) {
+  await cartStore.fetchCart();
+  if (!cart.value) {
     error.value = "Your cart exploded. Oho no";
     return;
   }
-  cart.value = cartStore.shoppingCart();
   loaded.value = true;
 });
 </script>

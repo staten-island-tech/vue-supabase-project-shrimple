@@ -1,8 +1,8 @@
 <template>
   <h1 class="text-xl underline text-center">as shrimple as that</h1>
   <div class="flex justify-center w-full">
-    <div class="flex flex-wrap justify-around gap-4 w-4/5" v-if="loaded">
-      <ItemCard v-for="item in items" :item="item" :key="item.id" class="flex-grow" />
+    <div class="flex flex-wrap justify-around gap-4 w-11/12" v-if="loaded">
+      <ItemCard v-for="item in items" :item="item" :key="item.id" class="flex-grow max-w-lg" />
     </div>
     <p v-else>please wait...</p>
   </div>

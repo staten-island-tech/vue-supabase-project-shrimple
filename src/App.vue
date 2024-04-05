@@ -7,11 +7,10 @@ const userStore = useUserStore();
 const admin = ref(false);
 
 onMounted(async () => {
-  console.log("MOUNTED");
   const user = await userStore.user;
-  console.log(user);
   if (!user) return;
-  const admins = await supabase.from("admins").select("id").eq("id", user.data.user?.id);
+
+  const admins = await supabase.from("admins").select();
   if (!admins.data) return;
   admin.value = admins.data.length > 0;
 });

@@ -1,25 +1,26 @@
 <template>
   <div>
     <RouterLink to="/"><p class="text-center">go home</p></RouterLink>
-    <p v-if="loaded">welcome to the admin page</p>
-    <p v-else-if="error">{{ error }}</p>
+    <div v-if="loaded" class="flex flex-col items-center">
+      <h1 class="font-bold text-lg">welcome to the admin page</h1>
+      <RouterLink to="/admin/edit"><p>edit listings</p></RouterLink>
+    </div>
     <p v-else>please wait...</p>
   </div>
 </template>
 
 <script setup lang="ts">
-import { supabase } from "../../utils/supabase";
-import { useUserStore } from "@/stores/user";
 import { ref, onMounted } from "vue";
-const userStore = useUserStore();
 
 const loaded = ref(false);
-const error = ref("");
 
+import { useUserStore } from "@/stores/user";
+const userStore = useUserStore();
 onMounted(async () => {
   const admin = await userStore.isAdmin;
   if (!admin) {
-    error.value = "You're not supposed to be here.";
+    alert("You're not supposed to be here...");
+    window.location.href = window.location.origin;
     return;
   }
   loaded.value = true;

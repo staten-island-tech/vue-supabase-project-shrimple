@@ -9,7 +9,6 @@ export const useUserStore = defineStore("user", () => {
   const user = computed(async () => {
     // if not signed in, use anonymous user (for cart to work)
     const session = await supabase.auth.getSession();
-    console.log(session);
     if (!session.data.session) {
       console.log("NO SESSION");
       const response = await supabase.auth.getUser();
@@ -26,10 +25,11 @@ export const useUserStore = defineStore("user", () => {
   });
 
   const isAdmin = computed(async () => {
+    if (!dbUser) dbUser = await supabase.auth.getUser();
     if (dbUser.data.user?.aud !== "authenticated") {
       return false;
     }
-    const response = await supabase.from("admins").select().eq("id", dbUser.data.user.id);
+    const response = await supabase.from("admins").select();
     if (!response.data) return false;
     return response.data.length > 0;
   });
@@ -55,7 +55,7 @@ export const useUserStore = defineStore("user", () => {
   }
 
   async function signOut() {
-    const { error } = await supabase.auth.signOut({ scope: "local" });
+    await supabase.auth.signOut({ scope: "local" });
     localStorage.clear();
     window.location.reload();
   }

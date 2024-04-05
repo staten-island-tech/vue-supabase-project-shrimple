@@ -7,6 +7,6 @@ export interface Item {
   image: string;
 }
 
-export interface cart {
+export interface Cart {
   [key: string]: number;
 }
