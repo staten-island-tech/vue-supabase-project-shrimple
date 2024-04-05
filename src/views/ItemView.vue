@@ -1,10 +1,12 @@
 <template>
-  <div v-if="loaded && item">
+  <div v-if="loaded && item" class="flex flex-col items-center gap-2">
     <h1 class="text-lg">{{ item.name }}</h1>
     <h2 class="font-mono">${{ item.price }}</h2>
     <img :src="item.image" />
-    <p v-if="item.description">{{ item.description }}</p>
-    <p v-if="item.stock">only {{ item.stock }} left in stock</p>
+    <pre class="font-sans bg-slate-200 w-min">{{ item.description }}</pre>
+    <p>
+      only <span class="font-bold">{{ item.stock }}</span> left in stock
+    </p>
     <button @click="add">BUY!!</button>
   </div>
   <div v-if="error">
@@ -14,7 +16,6 @@
 </template>
 
 <script setup lang="ts">
-import { RouterLink } from "vue-router";
 import { supabase } from "../../utils/supabase";
 import type { Item } from "../types/interface";
 import type { Ref } from "vue";
