@@ -2,7 +2,7 @@
   <h1 class="text-center text-xl underline">amazing login page</h1>
   <div class="flex flex-col gap-4 items-center">
     <p>{{ signedIn ? `you are signed in as ${signedIn}` : "you aren't signed in" }}</p>
-    <div class="flex flex-col gap-1">
+    <div class="flex flex-col gap-1 items-center">
       <button @click="userStore.anonToUser" v-if="!signedIn">CREATE ACCOUNT</button>
       <button @click="signIn" v-if="!signedIn">LOGIN</button>
       <button @click="userStore.signOut" v-if="signedIn">logout</button>

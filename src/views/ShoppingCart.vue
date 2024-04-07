@@ -7,6 +7,9 @@
       <p>
         {{ cart }}
       </p>
+      <button :disabled="Object.keys(cart).length < 1" :title="Object.keys(cart).length < 1 ? 'your cart is empty...' : null" @click="cartStore.placeOrder">
+        place order
+      </button>
     </div>
     <p v-else-if="error">{{ error }}</p>
     <p v-else>please wait...</p>

@@ -15,7 +15,7 @@ export const useUserStore = defineStore("user", () => {
       if (!response.data.user || response.error) {
         console.log("creating anonymous user...");
         await supabase.auth.signInAnonymously();
-        dbUser = await supabase.auth.getUser();
+        await signedIn();
       } else {
         dbUser = response;
       }
@@ -34,6 +34,13 @@ export const useUserStore = defineStore("user", () => {
     return response.data.length > 0;
   });
 
+  async function signedIn() {
+    const { data, error } = await supabase.auth.getUser();
+    console.log(data, error);
+    await supabase.from("users").insert({ user_id: data.user?.id });
+    dbUser = await supabase.auth.getUser();
+  }
+
   async function anonToUser() {
     const { data, error } = await supabase.auth.linkIdentity({
       provider: "google",
@@ -41,7 +48,7 @@ export const useUserStore = defineStore("user", () => {
         redirectTo: window.location.href,
       },
     });
-    if (data && !error) dbUser = await supabase.auth.getUser();
+    if (data && !error) await signedIn();
   }
 
   async function signIn() {
@@ -51,7 +58,7 @@ export const useUserStore = defineStore("user", () => {
         redirectTo: window.location.href,
       },
     });
-    if (data && !error) dbUser = await supabase.auth.getUser();
+    if (data && !error) await signedIn();
   }
 
   async function signOut() {

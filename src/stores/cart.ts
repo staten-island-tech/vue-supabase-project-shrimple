@@ -14,7 +14,7 @@ export const useCartStore = defineStore("cart", () => {
     if (!user.data.user) return;
     console.log("creating cart");
     // if id already has a cart this won't error. cool!
-    await supabase.from("carts").insert({ id: user.data.user.id });
+    await supabase.from("carts").insert({ user_id: user.data.user.id });
   }
 
   async function addToCart(id: string, amount: number) {
@@ -24,6 +24,7 @@ export const useCartStore = defineStore("cart", () => {
     cart.value[id] += amount;
     await saveCart();
   }
+
   async function fetchCart() {
     const user = await userStore.user;
     if (!user || !user.data.user) return;
@@ -34,7 +35,7 @@ export const useCartStore = defineStore("cart", () => {
       await createCart();
       cart.value = {};
     } else {
-      cart.value = JSON.parse(dbCart.data[0].data);
+      cart.value = dbCart.data[0].data;
     }
 
     console.log("fetched", cart.value);
@@ -44,7 +45,7 @@ export const useCartStore = defineStore("cart", () => {
     console.log("saving", cart.value);
     const user = await userStore.user;
     if (!user || user.data.user?.aud !== "authenticated") {
-      alert("You are not signed in somehow??");
+      alert("You don't exist??");
       return;
     }
 
@@ -54,9 +55,31 @@ export const useCartStore = defineStore("cart", () => {
       }
     }
 
-    await supabase.from("carts").update({ data: JSON.stringify(cart.value) });
+    await supabase.from("carts").update({ data: cart.value }).eq("user_id", user.data.user.id);
     console.log("just saved", cart.value);
   }
 
-  return { cart, addToCart, fetchCart, saveCart };
+  async function placeOrder() {
+    console.log(cart.value);
+    const user = await userStore.user;
+    if (!user || !user.data.user) return;
+    if (user?.data.user?.is_anonymous) {
+      alert("you must be signed in!!!");
+      return;
+    }
+
+    if (Object.keys(cart.value).length < 1) {
+      alert("bro you don't even have anything...");
+      return;
+    }
+
+    const { error } = await supabase.from("orders").insert({ user_id: user.data.user.id, data: cart.value });
+    if (!error) {
+      cart.value = {};
+      await saveCart();
+      alert("your order was placed!!");
+    }
+  }
+
+  return { cart, addToCart, fetchCart, saveCart, placeOrder };
 });
