@@ -11,11 +11,11 @@
     </label>
     <label>
       price
-      <input type="number" v-model="fields.price" min="0" />
+      <input type="number" v-model="fields.price" min="0" step="0.01" />
     </label>
     <label>
       stock
-      <input type="number" v-model="fields.stock" min="0" />
+      <input type="number" v-model="fields.stock" min="0" max="32767" />
     </label>
 
     <div class="flex flex-col gap-2">
@@ -61,18 +61,35 @@ const fields: Partial<Item> = reactive(structuredClone(toRaw(props.item)));
 delete fields.id;
 
 async function save() {
-  console.log("saving", fields, "to", props.item.id);
-  // UNSAVED means it was created and does not exist on db, so don't add id so supabase does insert and makes its own id
-  // otherwise, set id so supabase updates existing item
-  const obj = fields;
-  if (!props.item.id.startsWith("UNSAVED")) obj.id = props.item.id;
+  if (!fields.stock || fields.stock > 32767 || fields.stock < 0) {
+    alert("stock must be number in range 0 to 32767 (inclusive)");
+    return;
+  }
 
-  const { data, error } = await supabase.from("items").upsert(obj, { ignoreDuplicates: false }).select();
-  if (error) {
-    alert(`did you know? every ${error.code} minutes in Africa, ${Number(error.code) * 60} seconds pass`);
-    console.log(error);
+  console.log("saving", fields, "to", props.item.id);
+  let response;
+  const dbItem = (await supabase.from("items").select("id").eq("id", props.item.id)).data;
+  console.log(dbItem);
+  if (dbItem && dbItem.length > 0) {
+    response = await supabase.from("items").update(fields).eq("id", props.item.id);
   } else {
-    emits("update", data[0].id, props.item.id);
+    const obj = fields;
+    delete fields.id;
+    response = await supabase.from("items").insert(obj).select();
+    console.log(response);
+    if (response.error || !response.data) {
+      alert("something went wrong");
+      return;
+    }
+    emits("update", props.item.id, response.data[0].id);
+    alert(`successfully created item "${fields.name}"`);
+    return;
+  }
+
+  if (response.error) {
+    alert(`did you know? every ${response.error.code} minutes in Africa, ${Number(response.error.code) * 60} seconds pass`);
+    console.log(response.error);
+  } else {
     alert(`successfully saved item "${fields.name}"`);
   }
 }

@@ -29,7 +29,7 @@ onMounted(async () => {
   loaded.value = true;
 });
 
-async function updateItem(newid: string, oldid: string) {
+async function updateItem(oldid: string, newid: string) {
   const data = await supabase.from("items").select().eq("id", newid);
   if (!data.data) {
     alert("something went wrong :(");
