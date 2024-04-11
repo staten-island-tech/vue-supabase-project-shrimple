@@ -1,18 +1,28 @@
 <template>
   <div class="bg-slate-200 p-4 border-2 border-black flex flex-col gap-2">
     <code class="text-gray-500 text-xs">item {{ item.id }}</code>
+
     <label>
       name
       <input type="text" v-model="fields.name" />
     </label>
-    <label>
-      description
-      <textarea v-model="fields.description"></textarea>
-    </label>
+
+    <div class="flex flex-col">
+      <label>
+        description
+        <textarea v-model="fields.description" @input="updatePreview"></textarea>
+      </label>
+      <details class="bg-blue-200">
+        <summary>preview</summary>
+        <output v-html="output" class="markdown"></output>
+      </details>
+    </div>
+
     <label>
       price
       <input type="number" v-model="fields.price" min="0" step="0.01" />
     </label>
+
     <label>
       stock
       <input type="number" v-model="fields.stock" min="0" max="32767" />
@@ -41,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, toRaw } from "vue";
+import { ref, reactive, toRaw, watch } from "vue";
 import type { PropType } from "vue";
 import type { Item } from "../../types/interface";
 import { supabase } from "../../../utils/supabase";
@@ -57,11 +67,15 @@ const props = defineProps({
 
 const emits = defineEmits(["update", "del"]);
 
-const fields: Partial<Item> = reactive(structuredClone(toRaw(props.item)));
+// https://stackoverflow.com/a/61108377
+type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
+type Fields = Optional<Item, "id">;
+
+const fields: Fields = reactive(structuredClone(toRaw(props.item)));
 delete fields.id;
 
 async function save() {
-  if (!fields.stock || fields.stock > 32767 || fields.stock < 0) {
+  if (fields.stock > 32767 || fields.stock < 0) {
     alert("stock must be number in range 0 to 32767 (inclusive)");
     return;
   }
@@ -135,6 +149,16 @@ async function upload() {
   };
   reader.readAsDataURL(img);
 }
+
+import DOMPurify from "dompurify";
+import { Marked } from "marked";
+const marked = new Marked({ gfm: true, breaks: true });
+const output = ref("");
+
+async function updatePreview() {
+  output.value = DOMPurify.sanitize(await marked.parse(fields.description));
+}
+updatePreview();
 </script>
 
 <style scoped>
