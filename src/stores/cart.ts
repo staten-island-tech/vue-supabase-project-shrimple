@@ -29,7 +29,8 @@ export const useCartStore = defineStore("cart", () => {
     const user = await userStore.user;
     if (!user || !user.data.user) return;
 
-    const dbCart = await supabase.from("carts").select("data");
+    // eq needed because admins can see everyone's cart
+    const dbCart = await supabase.from("carts").select("data").eq("user_id", user.data.user.id);
 
     if (!dbCart.data || dbCart.data.length === 0) {
       await createCart();

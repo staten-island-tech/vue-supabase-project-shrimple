@@ -7,9 +7,10 @@
       <p>
         {{ cart }}
       </p>
-      <button :disabled="Object.keys(cart).length < 1" :title="Object.keys(cart).length < 1 ? 'your cart is empty...' : null" @click="cartStore.placeOrder">
+      <button :disabled="Object.keys(cart).length < 1" :title="Object.keys(cart).length < 1 ? 'your cart is empty...' : ''" @click="cartStore.placeOrder">
         place order
       </button>
+      <EditCart :user_id="user?.data.user?.id"></EditCart>
     </div>
     <p v-else-if="error">{{ error }}</p>
     <p v-else>please wait...</p>
@@ -40,6 +41,8 @@ onMounted(async () => {
   }
   loaded.value = true;
 });
+
+import EditCart from "@/components/EditCart.vue";
 </script>
 
 <style scoped></style>
