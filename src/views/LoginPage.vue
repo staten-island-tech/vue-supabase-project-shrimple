@@ -26,11 +26,10 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from "vue";
+import { onMounted, ref } from "vue";
 import type { Ref } from "vue";
 import { useUserStore } from "../stores/user";
 import { useCartStore } from "../stores/cart";
-import type { UserResponse } from "@supabase/supabase-js";
 import type { Cart } from "@/types/interface";
 import { storeToRefs } from "pinia";
 
@@ -38,13 +37,14 @@ const userStore = useUserStore();
 const cartStore = useCartStore();
 const signedIn = ref(false);
 const length = ref(0);
-const user: Ref<UserResponse | undefined> = ref();
+import type { User } from "@supabase/supabase-js";
+const user: Ref<User | undefined> = ref();
 const { cart } = storeToRefs(cartStore);
 
 onMounted(async () => {
-  user.value = await userStore.user;
-  if (user.value.data.user?.identities && user.value.data.user.identities[0]) {
-    signedIn.value = user.value.data.user.identities[0].identity_data ? user.value.data.user.identities[0].identity_data.name : "Mario from Mario Bros.";
+  user.value = await userStore.fetchUser();
+  if (user.value?.identities && user.value?.identities[0]) {
+    signedIn.value = user.value?.identities[0].identity_data ? user.value?.identities[0].identity_data.name : "Mario from Mario Bros.";
   }
 
   const url = new URL(window.location.href);
@@ -55,6 +55,9 @@ onMounted(async () => {
     window.location.assign(url.origin + url.pathname);
     return;
   }
+
+  if (!user.value) return;
+  console.log(user.value);
 
   await cartStore.fetchCart();
   const storedCart = localStorage.getItem("cart");

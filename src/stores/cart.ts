@@ -10,11 +10,11 @@ export const useCartStore = defineStore("cart", () => {
   const cart: Ref<Cart> = ref({});
 
   async function createCart() {
-    const user = await userStore.user;
-    if (!user.data.user) return;
+    const user = await userStore.fetchUser();
+    if (!user) return;
     console.log("creating cart");
     // if id already has a cart this won't error. cool!
-    await supabase.from("carts").insert({ user_id: user.data.user.id });
+    await supabase.from("carts").insert({ user_id: user.id });
   }
 
   async function addToCart(id: string, amount: number) {
@@ -26,11 +26,17 @@ export const useCartStore = defineStore("cart", () => {
   }
 
   async function fetchCart() {
-    const user = await userStore.user;
-    if (!user || !user.data.user) return;
+    let user = await userStore.fetchUser();
+    if (!user) {
+      await userStore.createAnonymousUser();
+      console.log("done1");
+      user = await userStore.fetchUser();
+      console.log("done2", user);
+    }
+    console.log((await supabase.auth.getSession()).data.session?.user);
 
     // eq needed because admins can see everyone's cart
-    const dbCart = await supabase.from("carts").select("data").eq("user_id", user.data.user.id);
+    const dbCart = await supabase.from("carts").select("data").eq("user_id", user?.id);
 
     if (!dbCart.data || dbCart.data.length === 0) {
       await createCart();
@@ -44,27 +50,27 @@ export const useCartStore = defineStore("cart", () => {
 
   async function saveCart() {
     console.log("saving", cart.value);
-    const user = await userStore.user;
-    if (!user || user.data.user?.aud !== "authenticated") {
+    const user = await userStore.fetchUser();
+    if (!user || user.aud !== "authenticated") {
       alert("You don't exist??");
       return;
     }
 
     for (const [key, value] of Object.entries(cart.value)) {
-      if (value === 0) {
+      if (value < 1) {
         delete cart.value[key];
       }
     }
 
-    await supabase.from("carts").update({ data: cart.value }).eq("user_id", user.data.user.id);
+    await supabase.from("carts").update({ data: cart.value }).eq("user_id", user.id);
     console.log("just saved", cart.value);
   }
 
   async function placeOrder() {
     console.log(cart.value);
-    const user = await userStore.user;
-    if (!user || !user.data.user) return;
-    if (user?.data.user?.is_anonymous) {
+    const user = await userStore.fetchUser();
+    if (!user) return;
+    if (user?.is_anonymous) {
       alert("you must be signed in!!!");
       return;
     }
@@ -74,7 +80,7 @@ export const useCartStore = defineStore("cart", () => {
       return;
     }
 
-    const { error } = await supabase.from("orders").insert({ user_id: user.data.user.id, data: cart.value });
+    const { error } = await supabase.from("orders").insert({ user_id: user.id, data: cart.value });
     if (!error) {
       cart.value = {};
       await saveCart();

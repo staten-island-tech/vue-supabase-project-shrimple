@@ -1,31 +1,20 @@
 import { computed } from "vue";
 import { defineStore } from "pinia";
 import { supabase } from "../../utils/supabase";
-import type { UserResponse } from "@supabase/supabase-js";
+import type { User } from "@supabase/supabase-js";
 
 export const useUserStore = defineStore("user", () => {
-  let dbUser: UserResponse;
+  let dbUser: User | undefined | null;
 
-  const user = computed(async () => {
-    // if not signed in, use anonymous user (for cart to work)
-    const session = await supabase.auth.getSession();
-    if (!session.data.session) {
-      console.log("NO SESSION");
-      const response = await supabase.auth.getUser();
-      if (!response.data.user || response.error) {
-        console.log("creating anonymous user...");
-        await supabase.auth.signInAnonymously();
-      } else {
-        dbUser = response;
-      }
-    }
-    if (!dbUser) dbUser = await supabase.auth.getUser();
+  async function fetchUser() {
+    dbUser = (await supabase.auth.getSession()).data.session?.user;
     return dbUser;
-  });
+  }
 
   const isAdmin = computed(async () => {
-    if (!dbUser) dbUser = await supabase.auth.getUser();
-    if (dbUser.data.user?.aud !== "authenticated") {
+    console.log("checking for admin");
+    if (!dbUser) dbUser = (await supabase.auth.getUser()).data.user;
+    if (dbUser?.aud !== "authenticated") {
       return false;
     }
     const response = await supabase.from("admins").select();
@@ -40,7 +29,7 @@ export const useUserStore = defineStore("user", () => {
         redirectTo: window.location.href,
       },
     });
-    if (data && !error) dbUser = await supabase.auth.getUser();
+    if (data && !error) dbUser = (await supabase.auth.getUser()).data.user;
   }
 
   async function signIn() {
@@ -50,7 +39,7 @@ export const useUserStore = defineStore("user", () => {
         redirectTo: window.location.href,
       },
     });
-    if (data && !error) dbUser = await supabase.auth.getUser();
+    if (data && !error) dbUser = (await supabase.auth.getUser()).data.user;
   }
 
   async function signOut() {
@@ -59,5 +48,19 @@ export const useUserStore = defineStore("user", () => {
     window.location.reload();
   }
 
-  return { user, anonToUser, signIn, signOut, isAdmin };
+  async function createAnonymousUser() {
+    const session = await supabase.auth.getSession();
+    if (!session.data.session) {
+      console.log("NO SESSION");
+      const response = await supabase.auth.getUser();
+      if (!response.data.user || response.error) {
+        console.log("creating anonymous user...");
+        await supabase.auth.signInAnonymously();
+      }
+    }
+    dbUser = (await supabase.auth.getUser()).data.user;
+    console.log(dbUser);
+  }
+
+  return { fetchUser, anonToUser, signIn, signOut, createAnonymousUser, isAdmin };
 });

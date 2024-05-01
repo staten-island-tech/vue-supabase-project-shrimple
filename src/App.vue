@@ -7,7 +7,7 @@ const userStore = useUserStore();
 const admin = ref(false);
 
 onMounted(async () => {
-  const user = await userStore.user;
+  const user = await userStore.fetchUser();
   if (!user) return;
 
   const admins = await supabase.from("admins").select();
