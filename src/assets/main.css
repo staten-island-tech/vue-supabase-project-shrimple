@@ -5,7 +5,7 @@
 @layer base {
   .button,
   button {
-    @apply bg-slate-100 w-fit p-1.5 border border-black cursor-pointer  transition-colors duration-200 ease-linear;
+    @apply bg-slate-100 w-fit p-1.5 drop-shadow-md border border-black cursor-pointer  transition-colors duration-200 ease-linear rounded;
   }
 
   button:disabled {

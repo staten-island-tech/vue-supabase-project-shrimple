@@ -17,7 +17,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <header class="w-full flex bg-slate-200 p-4 py-2 gap-4 items-center sticky top-0 border-b-2 border-black">
+  <header class="w-full flex p-4 py-2 gap-4 items-center sticky top-0 bg-gradient-to-r from-slate-200 border-b-2 border-black rounded">
     <span class="font-bold text-xl"><RouterLink to="/">soap</RouterLink></span>
     <span><RouterLink to="/store">store</RouterLink></span>
     <span><RouterLink to="/cart">cart</RouterLink></span>
@@ -30,6 +30,9 @@ onMounted(async () => {
 <style scoped>
 span {
   @apply border-r border-r-black pr-4 font-serif h-full;
+}
+span:hover {
+  @apply drop-shadow-sm;
 }
 span:last-of-type {
   @apply border-none;

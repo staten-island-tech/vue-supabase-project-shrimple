@@ -1,9 +1,12 @@
 <template>
-  <div class="bg-slate-200 p-4 border border-black flex flex-col cursor-pointer" @click="go">
+  <div
+    class="bg-slate-200 p-4 border border-black flex flex-col cursor-pointer hover:shadow-2xl transition-shadow duration-100 ease-linear rounded-lg"
+    @click="go"
+  >
     <h2 class="text-lg">{{ props.item.name }}</h2>
     <h2 class="font-mono">${{ props.item.price }}</h2>
     <img :src="props.item.image" class="h-80 self-center" />
-    <code>{{ props.item.id }}</code>
+    <!-- <code>{{ props.item.id }}</code> -->
   </div>
 </template>
 

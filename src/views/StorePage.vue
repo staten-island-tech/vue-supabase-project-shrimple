@@ -17,7 +17,7 @@ import type { Item } from "../types/interface";
 const items: Ref<Array<Item>> = ref([]);
 
 async function getItems() {
-  const { data } = await supabase.from("items").select();
+  const { data } = await supabase.from("items").select("name, id, price, stock, image");
   items.value = data as Array<Item>;
   loaded.value = true;
 }
