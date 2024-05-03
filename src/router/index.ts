@@ -32,6 +32,10 @@ const router = createRouter({
       path: "/admin/edit",
       component: () => import("../views/admin/EditView.vue"),
     },
+    {
+      path: "/gamble",
+      component: () => import("../views/GamblingRipoff.vue"),
+    },
   ],
 });
 

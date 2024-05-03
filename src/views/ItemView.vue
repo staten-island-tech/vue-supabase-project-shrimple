@@ -3,7 +3,7 @@
     <h1 class="text-lg">{{ item.name }}</h1>
     <h2 class="font-mono">${{ item.price }}</h2>
     <img :src="item.image" />
-    <section class="font-sans w-full markdown" v-html="output"></section>
+    <section class="font-sans w-full prose" v-html="output"></section>
     <p>
       only <span class="font-bold">{{ item.stock }}</span> left in stock
     </p>

@@ -14,7 +14,7 @@
       </label>
       <details class="bg-blue-200">
         <summary>preview</summary>
-        <output v-html="output" class="markdown"></output>
+        <output v-html="output" class="prose"></output>
       </details>
     </div>
 
