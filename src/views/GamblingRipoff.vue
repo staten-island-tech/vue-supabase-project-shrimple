@@ -73,14 +73,14 @@ async function spin() {
   while (speen > 1) {
     // use desmos to get a function
     speen--;
-    await shift(700 / (speen - 0.99) ** 0.05 - 600);
+    await shift(750 / (speen - 0.99) ** 0.05 - 600);
   }
   speen--;
   await fakeShift();
 }
 
 async function shift(ms: number) {
-  if (isNaN(ms)) ms = 600;
+  if (isNaN(ms)) ms = 750;
   if (ms < 0) ms = 10;
   const anim = gambleContainer.value.animate([{ transform: `translateX(-${magic}px)` }, { transform: `translateX(${-magic - 100}px)` }], {
     duration: ms,
@@ -96,7 +96,7 @@ async function fakeShift() {
   // 50-149 (left edge to just before right edge)
   const far = Math.ceil(Math.random() * 100) + 49;
   const anim = gambleContainer.value.animate([{ transform: `translateX(${-magic}px)`, easing: "ease-out" }, { transform: `translateX(${-magic - far}px)` }], {
-    duration: 1200,
+    duration: 750 * (far / 100),
     iterations: 1,
   });
   await anim.finished;
