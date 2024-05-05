@@ -30,9 +30,9 @@
   >
     spin
   </button>
-  <!-- <div v-if="ready">
+  <div v-if="ready">
     <code>{{ items[(index + 3) % items.length].name }}</code>
-  </div> -->
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -46,10 +46,10 @@ const ready = ref(false);
 const images: { [key: string]: string } = reactive({});
 
 async function spin() {
-  let speen = Math.ceil(Math.random() * items.length * 2) + 349;
-  // let speen = 10;
+  let speen = Math.ceil(Math.random() * items.length * 2) + 249;
+  // let speen = 3;
+  await firstShift(getDelay(speen));
   while (speen > 1) {
-    // use desmos to get a function
     speen--;
     await shift(getDelay(speen));
   }
@@ -58,44 +58,59 @@ async function spin() {
 }
 
 function getDelay(count: number) {
-  let ms = 750 / (0.1 * (count + 10) ** 0.9) - 30;
-  if (isNaN(ms)) ms = 1000;
-  if (ms > 400) ms = 400 + (ms - 400) * 0.75;
-  ms = Math.max(10, ms);
+  // use desmos to get a function
+  let ms = 750 / (0.01 * (count - 2) ** 2);
+  if (ms > 400) ms = 400 + (ms - 400) * 0.1;
+  ms = Math.min(1500, ms);
+  ms = Math.max(30, ms);
+  console.log(ms);
   return ms;
 }
 
+// first shift takes pointer from middle to edge
+async function firstShift(ms: number) {
+  const anim = gambleContainer.value.animate([{ transform: `translateX(${width * 0.5}vw)`, easing: "linear" }, { transform: `translateX(${0}vw)` }], {
+    duration: ms * 0.5,
+    iterations: 1,
+  });
+  await anim.finished;
+}
+
+// shift one full card over
 async function shift(ms: number) {
-  const anim = gambleContainer.value.animate([{ transform: `translateX(${width / 2}vw)`, easing: "linear" }, { transform: `translateX(${-width * 0.5}vw)` }], {
+  index.value++;
+  if (index.value >= items.length) index.value = 0;
+  gambleContainer.value.style.transform = `translateX(${width}vw)`;
+  const anim = gambleContainer.value.animate([{ transform: `translateX(${width}vw)`, easing: "linear" }, { transform: `translateX(${0}vw)` }], {
     duration: ms,
     iterations: 1,
   });
   await anim.finished;
-  index.value++;
-  if (index.value >= items.length) index.value = 0;
-  gambleContainer.value.style.transform = `translateX(${-width}vw)`;
 }
 
+// shift to random amount within final card
 async function fakeShift() {
   // left edge to just before right edge
-  const far = Math.floor(Math.random() * width) + Math.ceil(width * 0.5);
-  // const far = Math.ceil(width * 0.5);
-  // const far = Math.floor(width * 1.5);
+  const far = Math.floor(Math.random() * (width - 1)) + 1;
+  index.value++;
+  if (index.value >= items.length) index.value = 0;
+  gambleContainer.value.style.transform = `translateX(${width}vw)`;
   const anim = gambleContainer.value.animate(
-    [{ transform: `translateX(${width / 2}vw)`, easing: "linear" }, { transform: `translateX(${width / 2 - far}vw)` }],
+    [
+      { transform: `translateX(${width}vw)`, easing: "linear" },
+      { transform: `translateX(${width - far}vw)`, easing: "cubic-bezier(0.000, 1.127, 0.000, 0.987)" },
+    ],
     {
-      duration: getDelay(0),
+      duration: getDelay(0) * (far / width),
       iterations: 1,
     }
   );
   await anim.finished;
   transition.value = 0;
-  gambleContainer.value.style.transform = `translateX(${-far + width * 1.5}vw)`;
-  index.value++;
-  if (index.value >= items.length) index.value = 0;
+  gambleContainer.value.style.transform = `translateX(${width - far}vw)`;
   await wait(1000);
   transition.value = 1000;
-  gambleContainer.value.style.transform = `translateX(${width / 2}vw)`;
+  gambleContainer.value.style.transform = `translateX(${width * 0.5}vw)`;
 }
 
 async function wait(ms: number) {
