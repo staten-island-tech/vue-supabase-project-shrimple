@@ -12,3 +12,11 @@ app.use(createPinia());
 app.use(router);
 
 app.mount("#app");
+
+import { OhVueIcon, addIcons } from "oh-vue-icons";
+// use hero icons
+import { HiMinus, HiPlus } from "oh-vue-icons/icons";
+
+addIcons(HiMinus, HiPlus);
+
+app.component("v-icon", OhVueIcon);

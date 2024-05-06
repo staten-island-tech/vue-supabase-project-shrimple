@@ -9,10 +9,21 @@
   }
 
   button:disabled {
+    @apply bg-slate-300 drop-shadow-none;
     cursor: not-allowed;
   }
 
   button:hover:not(:disabled) {
-    @apply hover:bg-slate-300;
+    @apply hover:bg-slate-200 drop-shadow-xl;
+  }
+
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  image {
+    @apply border rounded;
   }
 }

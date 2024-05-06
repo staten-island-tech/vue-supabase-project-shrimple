@@ -1,7 +1,12 @@
 <template>
-  <div>
-    <p v-for="[key, quantity] in Object.entries(cart)" :key="key">you have {{ quantity }} of {{ key }}</p>
-    <CartCard v-for="[id] in Object.entries(cart)" :key="id" :item_id="id"></CartCard>
+  <div class="w-full flex flex-col items-center p-2">
+    <CartCard
+      v-for="[id, qty] in Object.entries(cart)"
+      :key="id"
+      :item_id="id"
+      :quantity="qty"
+      @explode="(id) => delete cart[id]"
+    />
   </div>
 </template>
 

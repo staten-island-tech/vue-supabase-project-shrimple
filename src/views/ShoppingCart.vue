@@ -1,16 +1,25 @@
 <template>
   <div>
-    <div v-if="loaded" class="flex flex-col items-center">
+    <div
+      v-if="loaded"
+      class="flex flex-col items-center"
+    >
+      <EditCart :user_id="user!.id"></EditCart>
       <!-- https://github.com/supabase/auth-js/pull/871 -->
       <!-- supabase stop LYING to me. is_anonymous is REAL -->
-      <p class="text-red-500" v-if="user?.is_anonymous">you aren't signed in; your cart may be lost FOREVER! (A really long time!)</p>
-      <p>
-        {{ cart }}
+      <p
+        class="text-red-500"
+        v-if="user?.is_anonymous"
+      >
+        you aren't signed in; your cart may be lost FOREVER! (A really long time!)
       </p>
-      <button :disabled="Object.keys(cart).length < 1" :title="Object.keys(cart).length < 1 ? 'your cart is empty...' : ''" @click="cartStore.placeOrder">
+      <button
+        :disabled="Object.keys(cart).length < 1"
+        :title="Object.keys(cart).length < 1 ? 'your cart is empty...' : ''"
+        @click="cartStore.placeOrder"
+      >
         place order
       </button>
-      <EditCart :user_id="user?.id"></EditCart>
     </div>
     <p v-else>{{ error }}</p>
   </div>
