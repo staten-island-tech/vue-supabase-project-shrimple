@@ -1,51 +1,105 @@
 <template>
-  <div class="bg-slate-200 p-4 border-2 border-black flex flex-col gap-2">
-    <code class="text-gray-500 text-xs">item {{ item.id }}</code>
+  <div
+    class="p-4 border-2 border-black flex flex-col gap-2 rounded-md"
+    :class="saved ? 'bg-slate-200' : 'bg-red-100'"
+    @change="checkSave"
+  >
+    <code class="text-gray-500 text-xs">
+      <span class="text-red-500">{{ saved ? "" : "UNSAVED " }}</span>
+      item {{ item.id }}
+    </code>
 
     <label>
       name
-      <input type="text" v-model="fields.name" />
+      <input
+        type="text"
+        v-model="fields.name"
+      />
     </label>
 
     <div class="flex flex-col">
       <label>
         description
-        <textarea v-model="fields.description" @input="updatePreview"></textarea>
+        <textarea
+          v-model="fields.description"
+          @input="updatePreview"
+          class="p-2"
+        ></textarea>
       </label>
       <details class="bg-blue-200">
         <summary>preview</summary>
-        <output v-html="output" class="prose"></output>
+        <output
+          v-html="output"
+          class="prose text-center"
+        ></output>
       </details>
     </div>
 
     <label>
       price
-      <input type="number" v-model="fields.price" min="0" step="0.01" />
+      <input
+        type="number"
+        v-model="fields.price"
+        min="0"
+        step="0.01"
+      />
     </label>
 
     <label>
       stock
-      <input type="number" v-model="fields.stock" min="0" max="32767" />
+      <input
+        type="number"
+        v-model="fields.stock"
+        min="0"
+        max="32767"
+      />
     </label>
 
     <div class="flex flex-col gap-2">
       <div v-if="fields.image">
         <label class="funny flex flex-row gap-2 items-center">
-          <input type="checkbox" v-model="funny" />
+          <input
+            type="checkbox"
+            v-model="funny"
+          />
           funny preview
         </label>
         <p>image preview</p>
-        <img :src="fields.image" class="h-80" :class="funny ? 'w-full' : ''" />
+        <img
+          :src="fields.image"
+          :class="funny ? 'funny-img' : ''"
+        />
       </div>
-      <label class="button">
-        ⬆ UPLOAD A NEW IMAGE
-        <input type="file" @change="upload" accept="image/*" ref="fileInput" class="hidden" />
+      <!-- secret funny -->
+      <label class="funny button">
+        <v-icon name="pr-upload"></v-icon>
+        UPLOAD A NEW IMAGE
+        <input
+          type="file"
+          @change="upload"
+          accept="image/*"
+          ref="fileInput"
+          class="hidden"
+        />
       </label>
     </div>
 
     <div class="flex gap-6">
-      <button @click="save">💾 SAVE CHANGES</button>
-      <button @click="emits('del', item.id)">🚮 DELETE ITEM</button>
+      <button @click="save">
+        <v-icon name="pr-save"></v-icon>
+        SAVE CHANGES
+      </button>
+      <button
+        @click="discard"
+        v-if="!saved"
+      >
+        <v-icon name="pr-times"></v-icon>
+        DISCARD CHANGES
+      </button>
+      <button @click="emits('del', item.id)">
+        <v-icon name="pr-trash"></v-icon>
+        DELETE ITEM
+      </button>
     </div>
   </div>
 </template>
@@ -71,7 +125,8 @@ const emits = defineEmits(["update", "del"]);
 type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 type Fields = Optional<Item, "id">;
 
-const fields: Fields = reactive(structuredClone(toRaw(props.item)));
+let fields: Fields = reactive(structuredClone(toRaw(props.item)));
+const saved = ref(true);
 delete fields.id;
 
 async function save() {
@@ -96,7 +151,7 @@ async function save() {
       return;
     }
     emits("update", props.item.id, response.data[0].id);
-    alert(`successfully created item "${fields.name}"`);
+    // alert(`successfully created item "${fields.name}"`);
     return;
   }
 
@@ -104,8 +159,19 @@ async function save() {
     alert(`did you know? every ${response.error.code} minutes in Africa, ${Number(response.error.code) * 60} seconds pass`);
     console.log(response.error);
   } else {
-    alert(`successfully saved item "${fields.name}"`);
+    lastSave = structuredClone(toRaw(fields));
+    saved.value = true;
   }
+}
+
+let lastSave: Fields = structuredClone(toRaw(fields));
+function checkSave() {
+  saved.value = JSON.stringify(lastSave) === JSON.stringify(fields);
+}
+
+function discard() {
+  fields = structuredClone(lastSave);
+  saved.value = true;
 }
 
 // BOO! import jumpscare!!
@@ -146,6 +212,7 @@ async function upload() {
     const cldImg = cld.image(`${responseData.public_id}.${responseData.format}`);
     cldImg.delivery(quality(90)).delivery(format(auto()));
     fields.image = cldImg.toURL();
+    checkSave();
   };
   reader.readAsDataURL(img);
 }
@@ -167,8 +234,17 @@ textarea {
   @apply border border-black;
 }
 
+img {
+  max-height: 20rem;
+  width: auto;
+}
+
 label:not(.funny) {
   /* didn't laugh */
   @apply flex flex-col;
+}
+
+.funny-img {
+  width: 100% !important;
 }
 </style>

@@ -1,6 +1,16 @@
 <template>
-  <div v-if="loaded" class="flex flex-col items-center p-2 gap-2 w-full">
-    <EditCard v-for="item in items" :key="item.id" :item="item" class="w-full" @update="updateItem" @del="deleteItem" />
+  <div
+    v-if="loaded"
+    class="flex flex-col items-center p-2 gap-2 w-full"
+  >
+    <EditCard
+      v-for="item in items"
+      :key="item.id"
+      :item="item"
+      class="w-full"
+      @update="updateItem"
+      @del="deleteItem"
+    />
     <button @click="add">ADD ITEM</button>
   </div>
 </template>
@@ -24,7 +34,7 @@ onMounted(async () => {
     window.location.href = window.location.origin;
     return;
   }
-  const data = await supabase.from("items").select();
+  const data = await supabase.from("items").select().order("name");
   items.value = data.data as Item[];
   loaded.value = true;
 });

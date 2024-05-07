@@ -14,9 +14,8 @@ app.use(router);
 app.mount("#app");
 
 import { OhVueIcon, addIcons } from "oh-vue-icons";
-// use hero icons
-import { HiMinus, HiPlus } from "oh-vue-icons/icons";
+import { PrMinus, PrPlus, PrSave, PrUpload, PrTimes, PrTrash } from "oh-vue-icons/icons";
 
-addIcons(HiMinus, HiPlus);
+addIcons(PrMinus, PrPlus, PrSave, PrUpload, PrTimes, PrTrash);
 
 app.component("v-icon", OhVueIcon);

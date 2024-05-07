@@ -45,6 +45,7 @@ onMounted(async () => {
   await cartStore.fetchCart();
   if (!cart.value || !user.value?.id) {
     error.value = "please wait a little longer...";
+    // honestly. if it gets this bad just give up. no one's cart should ever be empty
     if (!cart.value) alert("your cart exploded!!! oh dear.");
     return;
   }

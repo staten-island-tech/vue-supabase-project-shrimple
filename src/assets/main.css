@@ -8,11 +8,13 @@
     @apply bg-slate-100 w-fit p-1.5 drop-shadow-md border border-black cursor-pointer  transition-colors duration-200 ease-linear rounded;
   }
 
+  .button:disabled,
   button:disabled {
     @apply bg-slate-300 drop-shadow-none;
     cursor: not-allowed;
   }
 
+  .button:hover:not(:disabled),
   button:hover:not(:disabled) {
     @apply hover:bg-slate-200 drop-shadow-xl;
   }
@@ -23,7 +25,7 @@
     margin: 0;
   }
 
-  image {
+  img {
     @apply border rounded;
   }
 }

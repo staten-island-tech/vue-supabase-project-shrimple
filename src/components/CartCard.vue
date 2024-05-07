@@ -9,35 +9,44 @@
     />
     <div class="details">
       <h2>{{ item.name }}</h2>
-      <div class="quantity">
-        <button
-          class="button minus"
-          @click="change(qty - 1)"
-        >
-          <v-icon
-            name="hi-minus"
-            scale="0.5"
+      <div class="flex flex-row items-center gap-2">
+        <h3>
+          <label for="quantity"> quantity: </label>
+        </h3>
+        <div class="quantity drop-shadow-md">
+          <button
+            class="button minus"
+            @click="change(qty - 1)"
+          >
+            <v-icon
+              name="pr-minus"
+              scale="0.55"
+            />
+          </button>
+          <input
+            type="number"
+            min="1"
+            :max="item.stock"
+            @change="change(qty)"
+            v-model="qty"
+            ref="input"
+            :style="`transform: translateY(-${offset}px)`"
+            id="quantity"
           />
-        </button>
-        <input
-          type="number"
-          min="0"
-          :max="item.stock"
-          @change="change(qty)"
-          v-model="qty"
-          ref="input"
-          :style="`transform: translateY(-${offset}px)`"
-        />
-        <button
-          class="button plus"
-          @click="change(qty + 1)"
-        >
-          <v-icon
-            name="hi-plus"
-            scale="0.5"
-          />
-        </button>
+          <button
+            class="button plus"
+            @click="change(qty + 1)"
+          >
+            <v-icon
+              name="pr-plus"
+              scale="0.75"
+            />
+          </button>
+        </div>
       </div>
+      <span
+        >total cost: ${{ item.price }} × {{ qty }} = <output class="font-bold">${{ item.price * qty }}</output>
+      </span>
     </div>
   </div>
 </template>
@@ -64,7 +73,7 @@ const qty = ref(props.quantity);
 const offset = ref(0);
 
 onMounted(async () => {
-  const response = await supabase.from("items").select("image, name, stock").eq("id", props.item_id);
+  const response = await supabase.from("items").select("image, name, stock, price").eq("id", props.item_id);
   if (!response.data) return;
   item.value = response.data[0] as Item;
   change(qty.value);
@@ -74,12 +83,14 @@ import { useCartStore } from "@/stores/cart";
 const cartStore = useCartStore();
 const input: Ref<HTMLElement | null> = ref(null);
 async function change(val: number) {
+  // to the skies!!
   if (val > item.value!.stock) {
     val = item.value!.stock;
     offset.value += 4;
   } else {
     offset.value = 0;
   }
+
   if (val < 1) {
     const user = confirm(`are you sure you want to remove ${item.value!.name} from your cart?`);
     if (user) {
@@ -104,7 +115,7 @@ async function change(val: number) {
 
 <style scoped>
 .card {
-  @apply bg-slate-100 rounded-md p-2 w-11/12 flex-col md:flex-row  md:justify-between items-center md:items-start;
+  @apply bg-slate-100 rounded-md p-2 flex-col sm:flex-row sm:gap-10 md:justify-between items-center md:items-start;
   border: 2px black solid;
   display: flex;
   justify-content: space-between;
@@ -115,15 +126,11 @@ async function change(val: number) {
 }
 
 .card .details {
-  @apply flex flex-col items-center md:items-end;
+  @apply flex flex-col items-center md:items-end justify-between gap-2;
 }
 
 .card .quantity {
-  @apply flex flex-row gap-2;
-}
-
-.card .quantity * {
-  @apply drop-shadow-md;
+  @apply flex flex-row gap-2 items-center;
 }
 
 .card .details h2 {
@@ -131,8 +138,9 @@ async function change(val: number) {
 }
 
 .card .details input {
+  @apply border border-black rounded font-semibold;
+  height: 2rem;
   text-align: center;
-  @apply border border-black rounded;
   transition-duration: 30ms;
 }
 

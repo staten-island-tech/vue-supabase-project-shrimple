@@ -71,7 +71,7 @@ export const useCartStore = defineStore("cart", () => {
     const user = await userStore.fetchUser();
     if (!user) return;
     if (user?.is_anonymous) {
-      alert("you must be signed in!!!");
+      alert("you must be signed in to place an order!!!");
       return;
     }
 

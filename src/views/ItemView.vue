@@ -1,11 +1,17 @@
 <template>
-  <div v-if="loaded && item" class="flex flex-col items-center gap-2">
-    <h1 class="text-lg">{{ item.name }}</h1>
-    <h2 class="font-mono">${{ item.price }}</h2>
+  <div
+    v-if="loaded && item"
+    class="flex flex-col items-center gap-2"
+  >
+    <h1 class="text-3xl">{{ item.name }}</h1>
+    <h2 class="font-mono text-2xl">${{ item.price }}</h2>
     <img :src="item.image" />
-    <section class="font-sans w-full prose" v-html="output"></section>
+    <section
+      class="font-sans w-full prose text-center"
+      v-html="output"
+    ></section>
     <p>
-      only <span class="font-bold">{{ item.stock }}</span> left in stock
+      <span class="font-bold">{{ item.stock }}</span> left in stock
     </p>
     <button @click="add">BUY!!</button>
   </div>

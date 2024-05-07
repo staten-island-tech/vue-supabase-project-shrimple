@@ -3,12 +3,13 @@
     class="bg-slate-200 p-4 border border-black flex flex-col cursor-pointer hover:shadow-2xl transition-shadow duration-100 ease-linear rounded-lg flex-grow w-max"
     @click="go"
   >
-    <h2 class="text-lg">{{ props.item.name }}</h2>
-    <h2 class="font-mono">${{ props.item.price }}</h2>
-    <img
-      :src="props.item.image"
-      class="h-80 self-center"
-    />
+    <div>
+      <h2 class="text-lg">{{ props.item.name }}</h2>
+      <h2 class="font-mono">${{ props.item.price }}</h2>
+    </div>
+    <div class="flex flex-grow justify-around align-center">
+      <img :src="props.item.image" />
+    </div>
     <!-- <code>{{ props.item.id }}</code> -->
   </div>
 </template>
@@ -30,6 +31,7 @@ function go() {
 
 <style scoped>
 img {
-  width: 360px;
+  max-width: 360px;
+  height: auto;
 }
 </style>

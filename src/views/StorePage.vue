@@ -1,6 +1,6 @@
 <template>
-  <h1 class="text-xl underline text-center">as shrimple as that</h1>
-  <div class="flex justify-center w-full">
+  <!-- <h1 class="text-xl underline text-center">as shrimple as that</h1> -->
+  <div class="flex justify-center w-full my-4">
     <div
       class="flex flex-wrap justify-around gap-4 w-11/12"
       v-if="loaded"
@@ -25,7 +25,7 @@ import type { Item } from "../types/interface";
 const items: Ref<Array<Item>> = ref([]);
 
 async function getItems() {
-  const { data } = await supabase.from("items").select("name, id, price, stock, image");
+  const { data } = await supabase.from("items").select("name, id, price, stock, image").order("name");
   items.value = data as Array<Item>;
   loaded.value = true;
 }
