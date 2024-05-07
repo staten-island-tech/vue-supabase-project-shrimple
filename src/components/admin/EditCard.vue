@@ -1,7 +1,7 @@
 <template>
   <div
-    class="p-4 border-2 border-black flex flex-col gap-2 rounded-md"
-    :class="saved ? 'bg-slate-200' : 'bg-red-100'"
+    class="p-4 border-2 border-black flex flex-col gap-2 rounded-md transition-colors"
+    :class="saved ? 'bg-slate-100' : 'bg-red-100'"
     @change="checkSave"
   >
     <code class="text-gray-500 text-xs">

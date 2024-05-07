@@ -17,7 +17,8 @@
         >
           <div
             @click="getOrder(order)"
-            class="border border-black rounded bg-slate-100"
+            class="border rounded p-1 bg-slate-100"
+            :class="order.id === selected?.id ? 'border-cyan-500' : 'border-black'"
           >
             <p>
               order <span class="font-mono text-sm">{{ order.id }}</span>
@@ -30,35 +31,56 @@
 
       <div
         v-if="selected"
-        class="border border-black rounded-md bg-slate-100 p-4 flex flex-col gap-2 h-fit w-full"
+        class="border border-black rounded-md p-4 flex flex-col gap-2 h-fit w-full transition-colors"
+        :class="saved ? 'bg-slate-100' : 'bg-red-100'"
       >
-        <h2>edit order {{ selected.id }}:</h2>
-        <div class="flex flex-col">
-          <label>
+        <h2 class="font-mono text-sm text-gray-500">
+          edit order {{ selected.id }}<span class="text-red-500">{{ saved ? "" : " (UNSAVED)" }}</span
+          >:
+        </h2>
+        <div
+          class="flex flex-col"
+          @change="checkSave"
+        >
+          <label class="font-bold">
             status:
-            <input v-model="selected.status" />
+            <input
+              v-model="selected.status"
+              class="font-normal"
+            />
           </label>
-          <label class="flex flex-col">
+          <label class="flex flex-col font-bold">
             notes:
-            <textarea v-model="selected.notes"></textarea>
+            <textarea
+              v-model="selected.notes"
+              class="font-normal"
+            ></textarea>
           </label>
           <div>
-            <h3>cart:</h3>
+            <h3 class="font-bold">cart:</h3>
             <p
-              v-for="item in cart"
-              :key="item"
+              v-for="(qty, id) in cart"
+              :key="id"
             >
-              {{ item }}
+              {{ items[id].name }} × {{ qty }} ({{ items[id].stock }} × ${{ items[id].price }} =
+              <span class="font-bold">${{ items[id].stock * items[id].price }}</span
+              >)
             </p>
           </div>
         </div>
-        <p>contact information: {{ contact }}</p>
-        <div class="flex flex-row gap-2">
+        <p class="font-bold">
+          contact information: <span class="font-normal">{{ contact }}</span>
+        </p>
+        <div class="flex flex-row gap-2 buttons">
           <button @click="save">
             <v-icon name="pr-save"></v-icon>
             SAVE ORDER
           </button>
-          <button>
+          <button @click="fulfill">
+            <v-icon name="pr-check-square"></v-icon>
+            FULFILL ORDER
+          </button>
+          <button @click="del">
             <v-icon name="pr-trash"></v-icon>
             DELETE ORDER
           </button>
@@ -69,51 +91,83 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref, type Ref } from "vue";
+import { onMounted, ref, type Ref, toRaw } from "vue";
 import { supabase } from "../../../utils/supabase";
-import type { Order } from "@/types/interface";
+import type { Item, Order } from "@/types/interface";
 
 type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 type Rdr = Optional<Order, "notes" | "data" | "user_id">;
-let orders: Array<Rdr> = reactive([]);
+let orders: Ref<Array<Rdr>> = ref([]);
 const loaded = ref(false);
 const all = ref(false);
 
 const selected: Ref<Order | undefined> = ref();
-let cart: Ref<Array<string>> = ref([]);
+let cart: Ref<{
+  [id: string]: number;
+}> = ref({});
 const contact: Ref<string> = ref("");
+let lastSave: Order | undefined;
+const saved = ref(true);
+let items: { [id: string]: Optional<Item, "image" | "description"> } = {};
+const cost = ref(0);
 
 onMounted(async () => {
   // oldest orders first
   const response = await supabase.from("orders").select("id, status, created_at").order("created_at");
   if (response.error) return;
-  orders = response.data;
+  orders.value = response.data;
   loaded.value = true;
+
+  // get all items
+  const { data, error } = await supabase.from("items").select("name, id, price, stock");
+  if (!error) {
+    data.forEach((item) => {
+      items[item.id] = {
+        name: item.name,
+        price: item.price,
+        stock: item.stock,
+      };
+    });
+  }
 });
 
 async function getOrder(order: Rdr) {
   contact.value = "";
-  cart.value = [];
+  cart.value = {};
+  cost.value = 0;
   const { data, error } = await supabase.from("orders").select().eq("id", order.id);
   if (error) return;
   selected.value = data[0] as unknown as Order;
+  console.log(selected.value.data);
+  cart.value = selected.value.data;
+  lastSave = structuredClone(toRaw(selected.value));
 
-  // get names
-  for (const [id, qty] of Object.entries(selected.value.data)) {
-    const { data, error } = await supabase.from("items").select("name").eq("id", id);
+  // get contact of order's user
+  {
+    if (!selected.value) return;
+    const { data, error } = await supabase.from("users").select().eq("user_id", selected.value.user_id);
     if (!error) {
-      const name = data[0].name;
-      // reactive wasn't detecting the sane way of doing this
-      cart.value.push(`${qty} × ${name}`);
+      contact.value = data[0] ? data[0].contact : "NONE";
     }
   }
 
-  {
-    const { data, error } = await supabase.from("users").select().eq("user_id", selected.value.user_id);
-    if (!error) {
-      console.log(data);
-      contact.value = data[0] ? data[0].contact : "NONE";
-    }
+  // get price
+  for (const [id, qty] of Object.entries(cart)) {
+    cost.value += items[id].price * qty;
+  }
+}
+
+async function del() {
+  if (!selected.value) return;
+  const prompt = confirm(`are you sure you want to delete order ${selected.value.id}?`);
+  if (!prompt) return;
+  const { error } = await supabase.from("orders").delete().eq("id", selected.value.id);
+  if (error) {
+    alert("something went wrong");
+  } else {
+    // no ts. this is not undefined
+    orders.value = orders.value.filter((order) => order.id !== selected.value!.id);
+    selected.value = undefined;
   }
 }
 
@@ -128,12 +182,60 @@ async function save() {
   }
   // i am tired. block scoping makes me sad
   {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { data, user_id, notes, ...saveOrder } = selected.value;
-    orders = orders.filter((order) => order.id !== id);
-    orders.push(saveOrder);
+    orders.value.splice(
+      orders.value.findIndex((order) => order.id === id),
+      1,
+      saveOrder
+    );
+
     if (selected.value.status === "fulfilled") selected.value = undefined;
   }
+  lastSave = structuredClone(toRaw(selected.value));
+  saved.value = true;
+}
+
+function checkSave() {
+  saved.value = JSON.stringify(lastSave) === JSON.stringify(selected.value) || selected.value === undefined;
+}
+
+async function fulfill() {
+  if (!selected.value) return;
+  const stocks: {
+    [id: string]: number;
+  } = {};
+
+  // https://stackoverflow.com/a/37576787  run fetches in parallel
+  await Promise.all(
+    Object.keys(cart.value).map(async (id) => {
+      const { data, error } = await supabase.from("items").select("id, stock").eq("id", id);
+      if (!error) {
+        stocks[id] = data[0].stock;
+      }
+    })
+  );
+
+  const output = Object.entries(stocks)
+    .map((item) => {
+      const [id, qty] = item;
+      console.log(item);
+      return `${items[id].name}: ${qty} → ${qty - cart.value[id]}`;
+    })
+    .sort();
+
+  const prompt = confirm(
+    `
+    are you sure you want to fullfil order ${selected.value.id}? this will mark the order as fulfilled and update the stock based on the order.\n
+    affected items:\n${output.join("\n")}
+    `
+  );
+  if (!prompt) return;
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.buttons * {
+  flex-grow: 1;
+}
+</style>

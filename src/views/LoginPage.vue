@@ -21,7 +21,7 @@
       >
         <button @click="userStore.signOut">logout</button>
         <label class="flex gap-2 items-center">
-          Please enter your contact information; we need it to process your order:
+          Please enter your contact information; we will contact you ONLY to process your order:
           <input
             type="text"
             ref="contact"
@@ -90,6 +90,9 @@ onMounted(async () => {
 
   if (!user.value) return;
   console.log(user.value);
+
+  const { data } = await supabase.from("users").select().eq("user_id", user.value.id);
+  if (data && contact.value) contact.value.value = data[0].contact;
 
   await cartStore.fetchCart();
   const storedCart = localStorage.getItem("cart");
