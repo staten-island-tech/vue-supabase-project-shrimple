@@ -1,8 +1,12 @@
 <template>
   <div>
-    <div v-if="loaded" class="flex flex-col items-center">
+    <div
+      v-if="loaded"
+      class="flex flex-col items-center"
+    >
       <h1 class="font-bold text-lg">welcome to the admin page</h1>
       <RouterLink to="/admin/edit"><p>edit listings</p></RouterLink>
+      <RouterLink to="/admin/orders"><p>view orders</p></RouterLink>
     </div>
     <p v-else>please wait...</p>
   </div>

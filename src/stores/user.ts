@@ -23,13 +23,19 @@ export const useUserStore = defineStore("user", () => {
   });
 
   async function anonToUser() {
-    const { data, error } = await supabase.auth.linkIdentity({
-      provider: "google",
-      options: {
-        redirectTo: window.location.href,
-      },
-    });
-    if (data && !error) dbUser = (await supabase.auth.getUser()).data.user;
+    if (dbUser && dbUser.is_anonymous) {
+      console.log("anonymous user");
+      const { data, error } = await supabase.auth.linkIdentity({
+        provider: "google",
+        options: {
+          redirectTo: window.location.href,
+        },
+      });
+      if (data && !error) dbUser = (await supabase.auth.getUser()).data.user;
+    } else {
+      console.log("no user at all");
+      await signIn();
+    }
   }
 
   async function signIn() {

@@ -105,7 +105,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, toRaw, watch } from "vue";
+import { ref, reactive, toRaw } from "vue";
 import type { PropType } from "vue";
 import type { Item } from "../../types/interface";
 import { supabase } from "../../../utils/supabase";
@@ -231,7 +231,7 @@ updatePreview();
 <style scoped>
 input,
 textarea {
-  @apply border border-black;
+  @apply border border-black rounded p-1;
 }
 
 img {

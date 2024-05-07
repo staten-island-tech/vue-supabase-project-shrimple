@@ -3,11 +3,37 @@
   <div class="flex flex-col gap-4 items-center">
     <p>{{ signedIn ? `you are signed in as ${signedIn}` : "you aren't signed in" }}</p>
     <div class="flex flex-col gap-1 items-center">
-      <button @click="userStore.anonToUser" v-if="!signedIn">CREATE ACCOUNT</button>
-      <button @click="signIn" v-if="!signedIn">LOGIN</button>
-      <button @click="userStore.signOut" v-if="signedIn">logout</button>
+      <button
+        @click="userStore.anonToUser"
+        v-if="!signedIn"
+      >
+        CREATE ACCOUNT
+      </button>
+      <button
+        @click="signIn"
+        v-if="!signedIn"
+      >
+        LOGIN
+      </button>
+      <div
+        v-if="signedIn"
+        class="flex flex-col items-center"
+      >
+        <button @click="userStore.signOut">logout</button>
+        <label class="flex gap-2 items-center">
+          Please enter your contact information; we need it to process your order:
+          <input
+            type="text"
+            ref="contact"
+            @change="save"
+          />
+        </label>
+      </div>
     </div>
-    <details class="bg-slate-200 p-4 rounded-md w-4/5" v-if="!signedIn">
+    <details
+      class="bg-slate-200 p-4 rounded-md w-4/5"
+      v-if="!signedIn"
+    >
       <summary>What's the difference?</summary>
       <div class="border-t-2 mt-2 pt-2 border-black">
         <ul class="list-inside list-disc">
@@ -41,6 +67,8 @@ import type { User } from "@supabase/supabase-js";
 const user: Ref<User | undefined> = ref();
 const { cart } = storeToRefs(cartStore);
 
+const contact: Ref<HTMLInputElement | null> = ref(null);
+
 onMounted(async () => {
   user.value = await userStore.fetchUser();
   if (user.value?.identities && user.value?.identities[0]) {
@@ -54,6 +82,10 @@ onMounted(async () => {
     alert("your sign in failed... try logging in instead");
     window.location.assign(url.origin + url.pathname);
     return;
+  }
+  if (url.hash) {
+    localStorage.clear();
+    window.location.assign(url.origin + url.pathname);
   }
 
   if (!user.value) return;
@@ -86,6 +118,15 @@ onMounted(async () => {
 async function signIn() {
   localStorage.setItem("cart", JSON.stringify(cart.value));
   await userStore.signIn();
+}
+
+import { supabase } from "../../utils/supabase";
+async function save() {
+  console.log("JOemama");
+  const user = await userStore.fetchUser();
+  if (!contact.value || !user) return;
+  console.log(contact.value);
+  await supabase.from("users").update({ contact: contact.value.value }).eq("user_id", user.id);
 }
 </script>
 

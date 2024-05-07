@@ -25,6 +25,7 @@ export const useCartStore = defineStore("cart", () => {
     await saveCart();
   }
 
+  // get current user's cart
   async function fetchCart() {
     let user = await userStore.fetchUser();
     if (!user) {
@@ -71,20 +72,28 @@ export const useCartStore = defineStore("cart", () => {
     const user = await userStore.fetchUser();
     if (!user) return;
     if (user?.is_anonymous) {
-      alert("you must be signed in to place an order!!!");
-      return;
+      return "anon";
     }
 
     if (Object.keys(cart.value).length < 1) {
-      alert("bro you don't even have anything...");
-      return;
+      return "empty";
+    }
+
+    // if someone already has unfulfilled order, don't let them order
+    // there is also a function and trigger in place for this (RLS does not play nice when you refer to the table it's on)
+    console.log(user);
+    const { data } = await supabase.from("orders").select("user_id, status").eq("user_id", user.id);
+    if (!data) return;
+    if (data.filter((order) => order.status !== "fulfilled").length > 0) {
+      return "order already exists";
     }
 
     const { error } = await supabase.from("orders").insert({ user_id: user.id, data: cart.value });
     if (!error) {
       cart.value = {};
       await saveCart();
-      alert("your order was placed!!");
+
+      return "yay";
     }
   }
 

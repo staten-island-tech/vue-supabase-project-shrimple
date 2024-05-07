@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="item"
-    class="card"
+    class="card rounded-md p-4 flex-col sm:flex-row sm:gap-10 md:justify-between items-center md:items-start flex-grow w-full"
   >
     <img
       :src="item.image"
@@ -115,7 +115,6 @@ async function change(val: number) {
 
 <style scoped>
 .card {
-  @apply bg-slate-100 rounded-md p-2 flex-col sm:flex-row sm:gap-10 md:justify-between items-center md:items-start;
   border: 2px black solid;
   display: flex;
   justify-content: space-between;

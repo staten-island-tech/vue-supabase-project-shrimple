@@ -19,6 +19,11 @@
     @apply hover:bg-slate-200 drop-shadow-xl;
   }
 
+  input,
+  textarea {
+    @apply border border-black p-1 rounded drop-shadow-md;
+  }
+
   input[type="number"]::-webkit-inner-spin-button,
   input[type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none;

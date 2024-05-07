@@ -4,19 +4,27 @@
       v-if="loaded"
       class="flex flex-col items-center"
     >
-      <EditCart :user_id="user!.id"></EditCart>
+      <div class="w-fit flex flex-col items-center p-2 gap-4">
+        <CartCard
+          v-for="[id, qty] in Object.entries(cart)"
+          :key="id"
+          :item_id="id"
+          :quantity="qty"
+          @explode="(id: string) => delete cart[id]"
+        />
+      </div>
       <!-- https://github.com/supabase/auth-js/pull/871 -->
       <!-- supabase stop LYING to me. is_anonymous is REAL -->
       <p
         class="text-red-500"
-        v-if="user?.is_anonymous"
+        v-if="user?.is_anonymous || !user"
       >
         you aren't signed in; your cart may be lost FOREVER! (A really long time!)
       </p>
       <button
         :disabled="Object.keys(cart).length < 1"
         :title="Object.keys(cart).length < 1 ? 'your cart is empty...' : ''"
-        @click="cartStore.placeOrder"
+        @click="order"
       >
         place order
       </button>
@@ -26,6 +34,8 @@
 </template>
 
 <script setup lang="ts">
+import CartCard from "../components/CartCard.vue";
+
 import { useUserStore } from "@/stores/user";
 import { useCartStore } from "@/stores/cart";
 import type { Ref } from "vue";
@@ -43,16 +53,38 @@ const user: Ref<User | undefined> = ref(undefined);
 onMounted(async () => {
   user.value = await userStore.fetchUser();
   await cartStore.fetchCart();
-  if (!cart.value || !user.value?.id) {
-    error.value = "please wait a little longer...";
-    // honestly. if it gets this bad just give up. no one's cart should ever be empty
-    if (!cart.value) alert("your cart exploded!!! oh dear.");
+  if (!cart.value) {
+    // honestly. if it gets this bad just give up. no one's cart should ever be just gone
+    alert("your cart exploded!!! oh dear.");
     return;
   }
   loaded.value = true;
 });
 
-import EditCart from "@/components/EditCart.vue";
+async function order() {
+  const prompt = confirm(
+    "Are you sure you would like to place your order? You will not be able to make any more orders until your current order is fulfilled. You will also not be able to edit your order after it is placed."
+  );
+  if (!prompt) return;
+  const order = await cartStore.placeOrder();
+  switch (order) {
+    case "yay":
+      cart.value = {};
+      alert("your order was placed!!");
+      break;
+    case "order already exists":
+      alert("you've already placed an order!!");
+      break;
+    case "anon":
+      alert("you must be signed in to place an order!!!");
+      break;
+    case "empty":
+      alert("bro you don't even have anything...");
+      break;
+    default:
+      alert("there have been unforeseen consequences :(");
+  }
+}
 </script>
 
 <style scoped></style>

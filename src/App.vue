@@ -17,7 +17,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <header class="w-full flex p-4 py-2 gap-4 items-center sticky top-0 bg-gradient-to-r from-slate-200 to-slate-100 border-b-2 border-black">
+  <header class="w-full flex p-4 py-2 gap-4 items-center sticky top-0 bg-gradient-to-r from-slate-200 to-slate-100 border-b-2 border-black mb-4">
     <span class="font-bold text-xl"><RouterLink to="/">soap</RouterLink></span>
     <span><RouterLink to="/store">store</RouterLink></span>
     <span><RouterLink to="/cart">cart</RouterLink></span>
