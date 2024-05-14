@@ -62,10 +62,14 @@
               v-for="(qty, id) in cart"
               :key="id"
             >
-              {{ items[id].name }} × {{ qty }} ({{ items[id].stock }} × ${{ items[id].price }} =
-              <span class="font-bold">${{ items[id].stock * items[id].price }}</span
+              {{ items[id].name }} × {{ qty }} ({{ cart[id] }} × ${{ items[id].price }} = <span class="font-bold">${{ cart[id] * items[id].price }}</span
               >)
             </p>
+            <div v-if="cost > 0">
+              <p>
+                total cost: <span class="font-bold">${{ cost }}</span>
+              </p>
+            </div>
           </div>
         </div>
         <p class="font-bold">
@@ -76,7 +80,10 @@
             <v-icon name="pr-save"></v-icon>
             SAVE ORDER
           </button>
-          <button @click="fulfill">
+          <button
+            @click="fulfill"
+            v-if="selected.status !== 'fulfilled'"
+          >
             <v-icon name="pr-check-square"></v-icon>
             FULFILL ORDER
           </button>
@@ -126,8 +133,9 @@ onMounted(async () => {
         name: item.name,
         price: item.price,
         stock: item.stock,
-      };
+      } as Item;
     });
+    console.log(items);
   }
 });
 
@@ -152,8 +160,9 @@ async function getOrder(order: Rdr) {
   }
 
   // get price
-  for (const [id, qty] of Object.entries(cart)) {
+  for (const [id, qty] of Object.entries(cart.value)) {
     cost.value += items[id].price * qty;
+    console.log(cost.value);
   }
 }
 
@@ -190,7 +199,8 @@ async function save() {
       saveOrder
     );
 
-    if (selected.value.status === "fulfilled") selected.value = undefined;
+    // lastSave is set in getOrder(), should never be undefined
+    if (selected.value.status === "fulfilled" && lastSave?.status !== "fulfilled") selected.value = undefined;
   }
   lastSave = structuredClone(toRaw(selected.value));
   saved.value = true;
@@ -220,7 +230,7 @@ async function fulfill() {
     .map((item) => {
       const [id, qty] = item;
       console.log(item);
-      return `${items[id].name}: ${qty} → ${qty - cart.value[id]}`;
+      return `${items[id].name}: ${qty} → ${qty - cart.value[id]}${qty - cart.value[id] < 0 ? " (!)" : ""}`;
     })
     .sort();
 
@@ -231,6 +241,19 @@ async function fulfill() {
     `
   );
   if (!prompt) return;
+
+  await Promise.all(
+    Object.entries(stocks).map((item) => {
+      const [id, qty] = item;
+      return supabase
+        .from("items")
+        .update({ stock: qty - cart.value[id] })
+        .eq("id", id);
+    })
+  );
+
+  selected.value.status = "fulfilled";
+  await save();
 }
 </script>
 
