@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import type { PropType } from "vue";
+import { type PropType } from "vue";
 import type { Item } from "../types/interface";
 const props = defineProps({
   item: {
@@ -24,8 +24,9 @@ const props = defineProps({
   },
 });
 
+import router from "@/router";
 function go() {
-  window.location.assign(`${window.location.origin}/item/${props.item.id}?${props.item.name}`);
+  router.push(`/item/${props.item.id}?${props.item.name}`);
 }
 </script>
 

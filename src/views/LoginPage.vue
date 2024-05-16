@@ -54,6 +54,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import type { Ref } from "vue";
+import router from "@/router";
 import { useUserStore } from "../stores/user";
 import { useCartStore } from "../stores/cart";
 import type { Cart } from "@/types/interface";
@@ -63,7 +64,6 @@ const userStore = useUserStore();
 const cartStore = useCartStore();
 const signedIn = ref(false);
 const length = ref(0);
-const orderStatus = ref("");
 import type { User } from "@supabase/supabase-js";
 const user: Ref<User | undefined> = ref();
 const { cart } = storeToRefs(cartStore);
@@ -82,18 +82,20 @@ onMounted(async () => {
   if (!signedIn.value && params.get("error_code") === "422") {
     // user failed sign in (anontouser instead of login)
     alert("your sign in failed... try logging in instead");
-    window.location.assign(url.origin + url.pathname);
+    router.replace(url.pathname);
     return;
   }
-  if (url.hash) {
-    localStorage.clear();
-    window.location.assign(url.origin + url.pathname);
-  }
+  // if (url.hash) {
+  //   localStorage.clear();
+  //   window.location.replace(url.pathname);
+  // }
 
   if (!user.value) return;
   console.log(user.value);
 
-  const { data } = await supabase.from("users").select().eq("user_id", user.value.id);
+  console.log(user.value.id);
+  const { data } = await supabase.from("users").select("contact").eq("user_id", user.value.id);
+  console.log(data);
   if (data) {
     contact.value = data[0].contact;
     lastContact = contact.value;
@@ -101,8 +103,8 @@ onMounted(async () => {
 
   await cartStore.fetchCart();
   const storedCart = localStorage.getItem("cart");
-  if (storedCart) localStorage.removeItem("cart");
   if (signedIn.value && storedCart) {
+    localStorage.removeItem("cart");
     const parsedCart = JSON.parse(storedCart) as Cart;
     await cartStore.fetchCart();
     const dbCart = cart.value;
