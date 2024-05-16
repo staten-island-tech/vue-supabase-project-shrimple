@@ -1,6 +1,6 @@
 <template>
   <h1 class="text-center text-xl underline">amazing login page</h1>
-  <div class="flex flex-col gap-4 items-center">
+  <div class="flex flex-col gap-4 items-center px-4">
     <p>{{ signedIn ? `you are signed in as ${signedIn}` : "you aren't signed in" }}</p>
     <div class="flex flex-col gap-1 items-center">
       <button
@@ -17,14 +17,14 @@
       </button>
       <div
         v-if="signedIn"
-        class="flex flex-col items-center"
+        class="flex flex-col items-center gap-2"
       >
         <button @click="userStore.signOut">logout</button>
         <label class="flex gap-2 items-center">
-          Please enter your contact information; we will contact you ONLY to process your order:
+          Please enter your contact information; we need it to process your order:
           <input
             type="text"
-            ref="contact"
+            v-model="contact"
             @change="save"
           />
         </label>
@@ -63,11 +63,13 @@ const userStore = useUserStore();
 const cartStore = useCartStore();
 const signedIn = ref(false);
 const length = ref(0);
+const orderStatus = ref("");
 import type { User } from "@supabase/supabase-js";
 const user: Ref<User | undefined> = ref();
 const { cart } = storeToRefs(cartStore);
 
-const contact: Ref<HTMLInputElement | null> = ref(null);
+const contact = ref("");
+let lastContact = "";
 
 onMounted(async () => {
   user.value = await userStore.fetchUser();
@@ -92,7 +94,10 @@ onMounted(async () => {
   console.log(user.value);
 
   const { data } = await supabase.from("users").select().eq("user_id", user.value.id);
-  if (data && contact.value) contact.value.value = data[0].contact;
+  if (data) {
+    contact.value = data[0].contact;
+    lastContact = contact.value;
+  }
 
   await cartStore.fetchCart();
   const storedCart = localStorage.getItem("cart");
@@ -125,11 +130,14 @@ async function signIn() {
 
 import { supabase } from "../../utils/supabase";
 async function save() {
-  console.log("JOemama");
   const user = await userStore.fetchUser();
-  if (!contact.value || !user) return;
-  console.log(contact.value);
-  await supabase.from("users").update({ contact: contact.value.value }).eq("user_id", user.id);
+  if (contact.value.trim() === "" || !user) {
+    contact.value = lastContact;
+    return;
+  }
+  const { error } = await supabase.from("users").update({ contact: contact.value }).eq("user_id", user.id);
+
+  if (!error) lastContact = contact.value;
 }
 </script>
 

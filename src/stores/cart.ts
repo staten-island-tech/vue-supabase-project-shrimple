@@ -88,6 +88,9 @@ export const useCartStore = defineStore("cart", () => {
       return "order already exists";
     }
 
+    const contact = (await supabase.from("users").select("user_id, contact").eq("user_id", user.id)).data;
+    if (!contact || (contact[0].contact as string).trim() === "") return "no contact";
+
     const { error } = await supabase.from("orders").insert({ user_id: user.id, data: cart.value });
     if (!error) {
       cart.value = {};

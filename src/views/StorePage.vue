@@ -2,7 +2,7 @@
   <!-- <h1 class="text-xl underline text-center">as shrimple as that</h1> -->
   <div class="flex justify-center w-full">
     <div
-      class="flex flex-wrap gap-8 w-11/12"
+      class="flex flex-wrap gap-8 px-4"
       v-if="loaded"
     >
       <ItemCard
