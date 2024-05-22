@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-slate-200 p-4 border border-black flex flex-col cursor-pointer hover:shadow-2xl transition-shadow duration-100 ease-linear rounded-lg flex-grow w-max"
+    class="bg-slate-200 dark:bg-slate-800 p-4 border border-black dark:border-white flex flex-col cursor-pointer hover:shadow-2xl transition-shadow duration-100 ease-linear rounded-lg flex-grow w-max"
     @click="go"
   >
     <div>

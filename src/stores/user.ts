@@ -50,7 +50,6 @@ export const useUserStore = defineStore("user", () => {
 
   async function signOut() {
     await supabase.auth.signOut({ scope: "local" });
-    localStorage.clear();
     window.location.reload();
   }
 

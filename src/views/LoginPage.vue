@@ -85,10 +85,6 @@ onMounted(async () => {
     router.replace(url.pathname);
     return;
   }
-  // if (url.hash) {
-  //   localStorage.clear();
-  //   window.location.replace(url.pathname);
-  // }
 
   if (!user.value) return;
   console.log(user.value);

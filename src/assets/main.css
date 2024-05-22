@@ -5,23 +5,24 @@
 @layer base {
   .button,
   button {
-    @apply bg-slate-50 w-fit p-1.5 drop-shadow-md border border-black cursor-pointer  transition-colors duration-200 ease-linear rounded;
+    @apply bg-slate-50 dark:bg-slate-700 w-fit p-1.5 drop-shadow-md border border-black dark:border-white cursor-pointer  transition-colors duration-200 ease-linear rounded;
   }
 
   .button:disabled,
   button:disabled {
-    @apply bg-slate-300 drop-shadow-none;
+    @apply bg-slate-300 drop-shadow-none dark:bg-slate-500;
     cursor: not-allowed;
   }
 
   .button:hover:not(:disabled),
   button:hover:not(:disabled) {
-    @apply hover:bg-slate-200 drop-shadow-xl;
+    @apply hover:bg-slate-200 dark:hover:bg-slate-500 drop-shadow-xl;
   }
 
   input,
-  textarea {
-    @apply border border-black p-1 rounded drop-shadow-md bg-slate-50;
+  textarea,
+  select {
+    @apply border border-black dark:border-white p-1 rounded drop-shadow-md bg-slate-50  dark:bg-slate-700;
   }
 
   input[type="number"]::-webkit-inner-spin-button,
@@ -32,5 +33,9 @@
 
   img {
     @apply border rounded;
+  }
+
+  body.dark {
+    @apply bg-black text-white;
   }
 }
