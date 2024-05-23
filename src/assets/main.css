@@ -2,7 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
+@layer components {
+  body {
+    @apply dark:bg-black dark:text-white;
+  }
+
   .button,
   button {
     @apply bg-slate-50 dark:bg-slate-700 w-fit p-1.5 drop-shadow-md border border-black dark:border-white cursor-pointer  transition-colors duration-200 ease-linear rounded;
@@ -34,8 +38,10 @@
   img {
     @apply border rounded;
   }
+}
 
-  body.dark {
-    @apply bg-black text-white;
+@layer utilities {
+  .dark-border * {
+    @apply border-black dark:border-white;
   }
 }

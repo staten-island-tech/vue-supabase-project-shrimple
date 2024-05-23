@@ -6,12 +6,13 @@ const userStore = useUserStore();
 
 import type { Ref } from "vue";
 const admin = ref(false);
-const theme: Ref<string> = ref("default");
+const theme: Ref<string> = ref("");
 
 onMounted(async () => {
   let dark = localStorage.getItem("dark");
-  if (!dark) dark = window.matchMedia("(prefers-color-scheme: dark)").matches.toString();
+  if (!dark) dark = "default";
   theme.value = dark;
+  updateTheme();
 
   const user = await userStore.fetchUser();
   if (!user) return;
@@ -42,19 +43,17 @@ function updateTheme() {
 
 <template>
   <header
-    class="w-full flex p-4 py-2 gap-4 items-center sticky top-0 bg-gradient-to-r from-slate-200 to-slate-100 border-b-2 border-black dark:border-white mb-4 dark:from-black dark:to-slate-800 dark:text-white"
+    class="w-full flex py-2 px-4 items-center sticky top-0 bg-gradient-to-r mb-4 from-slate-200 to-slate-100 border-b-2 border-black dark:border-white dark:from-black dark:to-slate-800 dark:text-white"
   >
-    <span class="font-bold text-xl"><RouterLink to="/">soap</RouterLink></span>
-    <span><RouterLink to="/store">store</RouterLink></span>
-    <span><RouterLink to="/cart">cart</RouterLink></span>
-    <span><RouterLink to="/login">account</RouterLink></span>
-    <span
-      v-if="admin"
-      class="border-none"
-      ><RouterLink to="/admin">admin</RouterLink></span
-    >
+    <nav class="dark-border">
+      <span class="font-bold text-xl"><RouterLink to="/">soap</RouterLink></span>
+      <span><RouterLink to="/store">store</RouterLink></span>
+      <span><RouterLink to="/cart">cart</RouterLink></span>
+      <span><RouterLink to="/login">account</RouterLink></span>
+      <span v-if="admin"><RouterLink to="/admin">admin</RouterLink></span>
+    </nav>
     <span class="flex-grow"></span>
-    <span>
+    <span class="w-min">
       theme:
       <select
         class="dark:bg-slate-700 border dark:border-white"
@@ -78,14 +77,18 @@ function updateTheme() {
 header {
   z-index: 500;
 }
+header * {
+  @apply font-serif;
+}
 
-span {
-  @apply border-r border-r-black pr-4 font-serif h-full;
+nav {
+  @apply flex flex-row items-center gap-1 sm:gap-2 md:gap-4;
 }
-span:hover {
-  @apply drop-shadow-sm;
+nav span {
+  @apply border-r pr-1 sm:pr-2 md:pr-4 h-full;
 }
-span:last-of-type {
+
+nav span:last-of-type {
   @apply border-none pr-0;
 }
 </style>
