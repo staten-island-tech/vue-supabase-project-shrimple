@@ -3,7 +3,7 @@
   <div class="flex flex-col justify-center w-full">
     <div class="text-center">
       <h1 class="bold underline text-2xl">all our soaps</h1>
-      <h2 class="mb-4">(all {{ stock }} of them)</h2>
+      <h2 v-if="loaded" class="mb-4">(all {{ stock }} of them)</h2>
     </div>
     <div
       class="flex flex-wrap gap-8 px-4"

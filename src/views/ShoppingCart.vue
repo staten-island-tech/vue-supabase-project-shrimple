@@ -19,7 +19,7 @@
       you aren't signed in; your cart may be lost FOREVER! (A really long time!)
     </p>
     <button
-      :disabled="Object.keys(cart).length < 1"
+      :disabled="(Object.keys(cart).length < 1 || orderStatus.length > 0)"
       :title="Object.keys(cart).length < 1 ? 'your cart is empty...' : ''"
       @click="order"
     >
