@@ -87,6 +87,7 @@ async function order() {
     case "yay":
       cart.value = {};
       alert("your order was placed!!");
+      orderStatus.value = "you have an order already";
       break;
     case "order already exists":
       alert("you've already placed an order!!");
