@@ -7,7 +7,7 @@
     <h2 class="font-mono text-2xl">${{ item.price }}</h2>
     <img :src="item.image" />
     <section
-      class="font-sans w-full prose text-center"
+      class="font-sans w-full prose dark:prose-invert text-center"
       v-html="output"
     ></section>
     <p>

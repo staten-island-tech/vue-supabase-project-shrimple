@@ -3,6 +3,7 @@
     v-if="loaded"
     class="flex flex-col items-center"
   >
+  <h1 class="bold underline text-2xl">your cart</h1>
     <div class="w-fit flex flex-col items-center p-2 gap-4">
       <CartCard
         v-for="[id, qty] in Object.entries(cart)"
@@ -14,10 +15,7 @@
     </div>
     <!-- https://github.com/supabase/auth-js/pull/871 -->
     <!-- supabase stop LYING to me. is_anonymous is REAL -->
-    <p
-      class="text-red-500"
-      v-if="user?.is_anonymous || !user"
-    >
+    <p class="text-red-500" v-if="warn" >
       you aren't signed in; your cart may be lost FOREVER! (A really long time!)
     </p>
     <button
@@ -53,6 +51,7 @@ const orderStatus = ref("");
 const { cart } = storeToRefs(cartStore);
 import type { User } from "@supabase/supabase-js";
 const user: Ref<User | undefined> = ref(undefined);
+const warn = ref(true);
 
 import { supabase } from "@/../utils/supabase";
 onMounted(async () => {
@@ -66,7 +65,9 @@ onMounted(async () => {
   }
   loaded.value = true;
 
-  if (!user.value) return;
+  if (!user.value) return
+  // @ts-ignore
+  if (!user.value.is_anonymous) warn.value = false;
   const orders = (await supabase.from("orders").select("user_id,status").eq("user_id", user.value.id)).data;
   if (!orders) return;
   console.log(orders);

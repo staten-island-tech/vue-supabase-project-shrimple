@@ -1,6 +1,9 @@
 <template>
   <h1 class="text-center text-xl underline">amazing login page</h1>
-  <div class="flex flex-col gap-4 items-center px-4">
+  <div
+    class="flex flex-col gap-4 items-center px-4"
+    v-if="!loading"
+  >
     <p>{{ signedIn ? `you are signed in as ${signedIn}` : "you aren't signed in" }}</p>
     <div class="flex flex-col gap-1 items-center">
       <button
@@ -31,15 +34,15 @@
       </div>
     </div>
     <details
-      class="bg-slate-200 p-4 rounded-md w-4/5"
+      class="bg-slate-200 dark:bg-slate-800 p-4 rounded-md w-4/5 border border-black dark:border-white"
       v-if="!signedIn"
     >
       <summary>What's the difference?</summary>
-      <div class="border-t-2 mt-2 pt-2 border-black">
+      <div class="border-t-2 mt-2 pt-2 border-black dark:border-white">
         <ul class="list-inside list-disc">
           <li>
             <span class="font-bold">Create account</span>: If you haven't signed in before, use this. Your current cart will be saved.
-            <span class="underline">Do not use this option if you have signed in before.</span>
+            Do not use this option if you have signed in before.
           </li>
           <li><span class="font-bold">Login</span>: If you have signed in before, use this. Your current cart will be lost.</li>
           <output
@@ -62,6 +65,7 @@ import { storeToRefs } from "pinia";
 
 const userStore = useUserStore();
 const cartStore = useCartStore();
+const loading = ref(true);
 const signedIn = ref(false);
 const length = ref(0);
 import type { User } from "@supabase/supabase-js";
@@ -83,13 +87,17 @@ onMounted(async () => {
     // user failed sign in (anontouser instead of login)
     alert("your sign in failed... try logging in instead");
     router.replace(url.pathname);
+    router.go(0);
     return;
   }
+  if (url.hash) {
+    router.replace(url.pathname);
+  }
+
+  loading.value = false;
 
   if (!user.value) return;
-  console.log(user.value);
 
-  console.log(user.value.id);
   const { data } = await supabase.from("users").select("contact").eq("user_id", user.value.id);
   console.log(data);
   if (data) {

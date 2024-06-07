@@ -23,6 +23,7 @@ export const useUserStore = defineStore("user", () => {
   });
 
   async function anonToUser() {
+    // @ts-ignore
     if (dbUser && dbUser.is_anonymous) {
       console.log("anonymous user");
       const { data, error } = await supabase.auth.linkIdentity({

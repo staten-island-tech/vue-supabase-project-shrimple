@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  .dark-border * {
+    @apply border-black dark:border-white;
+  }
+}
+
 @layer components {
   body {
     @apply dark:bg-black dark:text-white;
@@ -9,24 +15,24 @@
 
   .button,
   button {
-    @apply bg-slate-50 dark:bg-slate-700 w-fit p-1.5 drop-shadow-md border border-black dark:border-white cursor-pointer  transition-colors duration-200 ease-linear rounded;
+    @apply bg-slate-50 dark:bg-slate-800 w-fit p-1.5 drop-shadow-md dark:dark-shadow-sm border border-black dark:border-white cursor-pointer  transition-colors duration-200 ease-linear rounded;
   }
 
   .button:disabled,
   button:disabled {
-    @apply bg-slate-300 drop-shadow-none dark:bg-slate-500;
+    @apply bg-slate-300 drop-shadow-none dark:bg-slate-600;
     cursor: not-allowed;
   }
 
   .button:hover:not(:disabled),
   button:hover:not(:disabled) {
-    @apply hover:bg-slate-200 dark:hover:bg-slate-500 drop-shadow-xl;
+    @apply hover:bg-slate-200 dark:hover:bg-slate-500 drop-shadow-xl dark:dark-shadow-md;
   }
 
   input,
   textarea,
   select {
-    @apply border border-black dark:border-white p-1 rounded drop-shadow-md bg-slate-50  dark:bg-slate-700;
+    @apply border border-black dark:border-white p-1 rounded drop-shadow-md bg-slate-50  dark:bg-slate-800;
   }
 
   input[type="number"]::-webkit-inner-spin-button,
@@ -37,11 +43,5 @@
 
   img {
     @apply border rounded;
-  }
-}
-
-@layer utilities {
-  .dark-border * {
-    @apply border-black dark:border-white;
   }
 }

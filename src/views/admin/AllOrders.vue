@@ -1,99 +1,102 @@
 <template>
   <div v-if="loaded">
-    <h1 class="font-bold underline">orders (oldest first)</h1>
-    <div class="flex flex-row gap-2">
-      <div class="flex flex-col gap-2 min-w-40 max-w-40">
-        <h2 class="italic">click an order below to start editing it</h2>
-        <label class="flex">
-          show fulfilled orders?
-          <input
-            type="checkbox"
-            v-model="all"
-          />
-        </label>
-        <div
-          v-for="order in all ? orders : orders.filter((order) => order.status !== 'fulfilled')"
-          :key="order.id"
-        >
-          <div
-            @click="getOrder(order)"
-            class="border rounded p-1 bg-slate-100"
-            :class="order.id === selected?.id ? 'border-cyan-500' : 'border-black'"
-          >
-            <p>
-              order <span class="font-mono text-sm">{{ order.id }}</span>
-            </p>
-            <p class="font-bold">status: {{ order.status }}</p>
-            <p class="font-bold">created: {{ new Date(order.created_at).toLocaleString() }}</p>
-          </div>
-        </div>
-      </div>
-
-      <div
-        v-if="selected"
-        class="border border-black rounded-md p-4 flex flex-col gap-2 h-fit w-full transition-colors"
-        :class="saved ? 'bg-slate-100' : 'bg-red-100'"
-      >
-        <h2 class="font-mono text-sm text-gray-500">
-          edit order {{ selected.id }}<span class="text-red-500">{{ saved ? "" : " (UNSAVED)" }}</span
-          >:
-        </h2>
-        <div
-          class="flex flex-col"
-          @change="checkSave"
-        >
-          <label class="font-bold">
-            status:
+    <div class="w-full flex flex-col items-center">
+      <h1 class="font-bold underline">orders (oldest first)</h1>
+      <div class="flex flex-row gap-2 w-11/12">
+        <div class="flex flex-col gap-2 min-w-40 max-w-40">
+          <h2 class="italic">click an order below to start editing it</h2>
+          <label class="flex">
+            show fulfilled orders?
             <input
-              v-model="selected.status"
-              class="font-normal"
+              type="checkbox"
+              v-model="all"
             />
           </label>
-          <label class="flex flex-col font-bold">
-            notes:
-            <textarea
-              v-model="selected.notes"
-              class="font-normal"
-            ></textarea>
-          </label>
-          <div>
-            <h3 class="font-bold">cart:</h3>
-            <p
-              v-for="(qty, id) in cart"
-              :key="id"
+          <div
+            v-for="order in all ? orders : orders.filter((order) => order.status !== 'fulfilled')"
+            :key="order.id"
+          >
+            <div
+              @click="getOrder(order)"
+              class="border rounded p-1 bg-slate-100 dark:bg-slate-800"
+              :class="order.id === selected?.id ? 'border-cyan-500' : 'border-black dark:border-white'"
             >
-              {{ items[id].name }} × {{ qty }} ({{ cart[id] }} × ${{ items[id].price }} = <span class="font-bold">${{ cart[id] * items[id].price }}</span
-              >)
-            </p>
-            <div v-if="cost > 0">
               <p>
-                total cost: <span class="font-bold">${{ cost }}</span>
+                order <span class="font-mono text-sm">{{ order.id }}</span>
               </p>
+              <p class="font-bold">status: {{ order.status }}</p>
+              <p class="font-bold">created: {{ new Date(order.created_at).toLocaleString() }}</p>
             </div>
           </div>
         </div>
-        <p class="font-bold">
-          contact information: <span class="font-normal">{{ contact }}</span>
-        </p>
-        <div class="flex flex-row gap-2 buttons">
-          <button @click="save">
-            <v-icon name="pr-save"></v-icon>
-            SAVE ORDER
-          </button>
-          <button
-            @click="fulfill"
-            v-if="selected.status !== 'fulfilled'"
+
+        <div
+          v-if="selected"
+          class="border border-black dark:border-white rounded-md p-4 flex flex-col gap-2 h-fit w-full transition-colors"
+          :class="saved ? 'bg-slate-100 dark:bg-slate-800' : 'bg-red-100 dark:bg-red-950'"
+        >
+          <h2 class="font-mono text-sm text-gray-600 dark:text-gray-300">
+            edit order {{ selected.id }}<span class="text-red-500">{{ saved ? "" : " (UNSAVED)" }}</span
+            >:
+          </h2>
+          <div
+            class="flex flex-col"
+            @change="checkSave"
           >
-            <v-icon name="pr-check-square"></v-icon>
-            FULFILL ORDER
-          </button>
-          <button @click="del">
-            <v-icon name="pr-trash"></v-icon>
-            DELETE ORDER
-          </button>
+            <label class="font-bold">
+              status:
+              <input
+                v-model="selected.status"
+                class="font-normal"
+              />
+            </label>
+            <label class="flex flex-col font-bold">
+              notes:
+              <textarea
+                v-model="selected.notes"
+                class="font-normal"
+              ></textarea>
+            </label>
+            <div>
+              <h3 class="font-bold">cart:</h3>
+              <p
+                v-for="(qty, id) in cart"
+                :key="id"
+              >
+                {{ items[id].name }} × {{ qty }} ({{ cart[id] }} × ${{ items[id].price }} = <span class="font-bold">${{ cart[id] * items[id].price }}</span
+                >)
+              </p>
+              <div v-if="cost > 0">
+                <p>
+                  total cost: <span class="font-bold">${{ cost }}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+          <p class="font-bold">
+            contact information: <span class="font-normal">{{ contact }}</span>
+          </p>
+          <div class="flex flex-row gap-2 buttons">
+            <button @click="save">
+              <v-icon name="pr-save"></v-icon>
+              SAVE ORDER
+            </button>
+            <button
+              @click="fulfill"
+              v-if="selected.status !== 'fulfilled'"
+            >
+              <v-icon name="pr-check-square"></v-icon>
+              FULFILL ORDER
+            </button>
+            <button @click="del">
+              <v-icon name="pr-trash"></v-icon>
+              DELETE ORDER
+            </button>
+          </div>
         </div>
       </div>
     </div>
+
   </div>
 </template>
 

@@ -40,6 +40,10 @@ const router = createRouter({
       path: "/gamble",
       component: () => import("../views/GamblingRipoff.vue"),
     },
+    {
+      path: "/:oops",
+      component: () => import("../views/FourOhFour.vue"),
+    },
   ],
 });
 

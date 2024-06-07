@@ -1,10 +1,10 @@
 <template>
   <div
     class="p-4 border-2 border-black flex flex-col gap-2 rounded-md transition-colors"
-    :class="saved ? 'bg-slate-100' : 'bg-red-100'"
+    :class="saved ? 'bg-slate-100 dark:bg-slate-800' : 'bg-red-100 dark:bg-red-950'"
     @change="checkSave"
   >
-    <code class="text-gray-500 text-xs">
+    <code class="text-gray-600 dark:text-gray-300 text-xs">
       <span class="text-red-500">{{ saved ? "" : "UNSAVED " }}</span>
       item {{ item.id }}
     </code>
@@ -26,12 +26,15 @@
           class="p-2"
         ></textarea>
       </label>
-      <details class="bg-blue-200">
+      <details>
         <summary>preview</summary>
-        <output
+        <div class="flex justify-center text-center dark:bg-slate-700 p-2 border border-black dark:border-white rounded">
+          <section
           v-html="output"
-          class="prose text-center"
-        ></output>
+          class="prose dark:prose-invert"
+          ></section>
+        </div>
+
       </details>
     </div>
 
@@ -68,6 +71,7 @@
         <img
           :src="fields.image"
           :class="funny ? 'funny-img' : ''"
+          :alt="`a picture of ${fields.name}`"
         />
       </div>
       <!-- secret funny -->

@@ -1,7 +1,6 @@
 <template>
-  <div
-    class="bg-slate-200 dark:bg-slate-900 p-4 border border-black dark:border-white flex flex-col cursor-pointer hover:shadow-2xl transition-shadow duration-100 ease-linear rounded-lg flex-grow w-max"
-    @click="go"
+  <RouterLink :to="url"
+    class="bg-slate-200 dark:bg-slate-800 p-4 border border-black dark:border-white flex flex-col cursor-pointer hover:shadow-2xl transition-shadow duration-100 ease-linear rounded-lg flex-grow w-max"
   >
     <div>
       <h2 class="text-lg">{{ props.item.name }}</h2>
@@ -11,12 +10,13 @@
       <img :src="props.item.image" />
     </div>
     <!-- <code>{{ props.item.id }}</code> -->
-  </div>
+  </RouterLink>
 </template>
 
 <script setup lang="ts">
-import { type PropType } from "vue";
+import { onMounted, type PropType, ref } from "vue";
 import type { Item } from "../types/interface";
+import { RouterLink } from "vue-router";
 const props = defineProps({
   item: {
     type: Object as PropType<Item>,
@@ -24,10 +24,10 @@ const props = defineProps({
   },
 });
 
-import router from "@/router";
-function go() {
-  router.push(`/item/${props.item.id}?${props.item.name}`);
-}
+const url = ref("/")
+onMounted(() => {
+  url.value = `/item/${props.item.id}?${props.item.name}`
+})
 </script>
 
 <style scoped>

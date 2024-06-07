@@ -3,6 +3,7 @@
     v-if="loaded"
     class="flex flex-col items-center p-2 gap-2 w-full"
   >
+  <h1 class="bold underline text-2xl">all soaps</h1>
     <EditCard
       v-for="item in items"
       :key="item.id"

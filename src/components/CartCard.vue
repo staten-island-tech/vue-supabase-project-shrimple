@@ -1,22 +1,24 @@
 <template>
   <div
     v-if="item"
-    class="card rounded-md p-4 flex-col sm:flex-row sm:gap-10 md:justify-between items-center md:items-start flex-grow w-full"
+    class="card rounded-md p-4 flex-col sm:flex-row sm:gap-10 md:justify-between items-center md:items-start flex-grow w-full dark:text-white border-2 border-black dark:border-white"
   >
     <img
       :src="item.image"
+      :aria-labelledby="props.item_id"
       class="image"
     />
     <div class="details">
-      <h2>{{ item.name }}</h2>
+      <h2 :id="props.item_id">{{ item.name }}</h2>
       <div class="flex flex-row items-center gap-2">
         <h3>
           <label for="quantity"> quantity: </label>
         </h3>
-        <div class="quantity drop-shadow-md">
+        <div class="quantity drop-shadow-md dark:*:dark-shadow-md">
           <button
             class="button minus"
             @click="change(qty - 1)"
+            aria-label="decrease quantity"
           >
             <v-icon
               name="pr-minus"
@@ -25,17 +27,18 @@
           </button>
           <input
             type="number"
+            id="quantity"
             min="1"
             :max="item.stock"
             @change="change(qty)"
             v-model="qty"
             ref="input"
             :style="`transform: translateY(-${offset}px)`"
-            id="quantity"
           />
           <button
             class="button plus"
             @click="change(qty + 1)"
+            aria-label="increase quantity"
           >
             <v-icon
               name="pr-plus"
@@ -115,7 +118,6 @@ async function change(val: number) {
 
 <style scoped>
 .card {
-  border: 2px black solid;
   display: flex;
   justify-content: space-between;
 }
@@ -137,7 +139,7 @@ async function change(val: number) {
 }
 
 .card .details input {
-  @apply border border-black rounded font-semibold;
+  @apply border rounded font-semibold;
   height: 2rem;
   text-align: center;
   transition-duration: 30ms;
@@ -146,6 +148,7 @@ async function change(val: number) {
 .card .details button {
   width: 2rem;
   height: 2rem;
-  @apply bg-white flex items-center justify-center;
+  @apply flex items-center justify-center;
+  transition-duration: 30ms;
 }
 </style>

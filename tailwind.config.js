@@ -12,7 +12,7 @@ export default {
           filter: "drop-shadow(0 1px 2px rgb(255 255 255 / 0.85))",
         },
         ".dark-shadow-md": {
-          filter: "drop-shadow(0 4px 3px rgb(255 255 255 / 0.85))  drop-shadow(0 2px 2px rgb(255 255 255 / 0.85))",
+          filter: "drop-shadow(0 1px 2px rgb(255 255 255 / 0.85))  drop-shadow(0 2px 3px rgb(255 255 255 / 0.55))",
         },
       };
       addUtilities(newUtilities, {

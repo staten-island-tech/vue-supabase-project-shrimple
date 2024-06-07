@@ -54,16 +54,18 @@ function updateTheme() {
     </nav>
     <span class="flex-grow"></span>
     <span class="w-min">
-      theme:
-      <select
-        class="dark:bg-slate-700 border dark:border-white"
-        @change="updateTheme"
-        v-model="theme"
-      >
-        <option>light</option>
-        <option>dark</option>
-        <option>default</option>
-      </select>
+      <label>
+        theme:
+        <select
+          class="dark:bg-slate-700 border dark:border-white"
+          @change="updateTheme"
+          v-model="theme"
+        >
+          <option>light</option>
+          <option>dark</option>
+          <option>default</option>
+        </select>
+      </label>
     </span>
   </header>
   <RouterView />
@@ -86,6 +88,13 @@ nav {
 }
 nav span {
   @apply border-r pr-1 sm:pr-2 md:pr-4 h-full;
+}
+/* 
+  https://stackoverflow.com/a/77845399
+  cursed
+*/
+nav span {
+  @apply drop-shadow-sm hover:drop-shadow-md dark:*:dark-shadow-sm hover:dark:*:dark-shadow-md;
 }
 
 nav span:last-of-type {

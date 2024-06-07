@@ -71,6 +71,7 @@ export const useCartStore = defineStore("cart", () => {
     console.log(cart.value);
     const user = await userStore.fetchUser();
     if (!user) return;
+    // @ts-ignore
     if (user?.is_anonymous) {
       return "anon";
     }
