@@ -63,7 +63,7 @@ function getDelay(count: number) {
   if (ms > 400) ms = 400 + (ms - 400) * 0.1;
   ms = Math.min(1500, ms);
   ms = Math.max(30, ms);
-  console.log(ms);
+  // console.log(ms);
   return ms;
 }
 

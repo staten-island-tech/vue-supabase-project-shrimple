@@ -139,17 +139,17 @@ async function save() {
     return;
   }
 
-  console.log("saving", fields, "to", props.item.id);
+  // console.log("saving", fields, "to", props.item.id);
   let response;
   const dbItem = (await supabase.from("items").select("id").eq("id", props.item.id)).data;
-  console.log(dbItem);
+  // console.log(dbItem);
   if (dbItem && dbItem.length > 0) {
     response = await supabase.from("items").update(fields).eq("id", props.item.id);
   } else {
     const obj = fields;
     delete fields.id;
     response = await supabase.from("items").insert(obj).select();
-    console.log(response);
+    // console.log(response);
     if (response.error || !response.data) {
       alert("something went wrong");
       return;
@@ -161,7 +161,7 @@ async function save() {
 
   if (response.error) {
     alert(`did you know? every ${response.error.code} minutes in Africa, ${Number(response.error.code) * 60} seconds pass`);
-    console.log(response.error);
+    // console.log(response.error);
   } else {
     lastSave = structuredClone(toRaw(fields));
     saved.value = true;
@@ -212,7 +212,7 @@ async function upload() {
       body: fd,
     });
     const responseData = JSON.parse(await response.text());
-    console.log(responseData);
+    // console.log(responseData);
     const cldImg = cld.image(`${responseData.public_id}.${responseData.format}`);
     cldImg.delivery(quality(90)).delivery(format(auto()));
     fields.image = cldImg.toURL();

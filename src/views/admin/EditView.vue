@@ -52,7 +52,7 @@ async function updateItem(oldid: string, newid: string) {
 
 function add() {
   if (!items.value) return;
-  console.log("adding item");
+  // console.log("adding item");
   items.value.push({
     // placeholder id for :key. supabase will generate its own
     id: "UNSAVED " + Date.now(),
@@ -63,7 +63,7 @@ function add() {
     image: "",
   });
 
-  console.log(items.value);
+  // console.log(items.value);
 }
 
 async function deleteItem(id: string) {
@@ -72,7 +72,7 @@ async function deleteItem(id: string) {
   items.value = items.value.filter((item) => item.id !== id);
   if (!id.startsWith("UNSAVED")) {
     const { error } = await supabase.from("items").delete().eq("id", id);
-    console.log(error);
+    // console.log(error);
     if (error) {
       alert("something went wrong??");
     }

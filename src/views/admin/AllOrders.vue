@@ -138,7 +138,7 @@ onMounted(async () => {
         stock: item.stock,
       } as Item;
     });
-    console.log(items);
+    // console.log(items);
   }
 });
 
@@ -149,7 +149,7 @@ async function getOrder(order: Rdr) {
   const { data, error } = await supabase.from("orders").select().eq("id", order.id);
   if (error) return;
   selected.value = data[0] as unknown as Order;
-  console.log(selected.value.data);
+  // console.log(selected.value.data);
   cart.value = selected.value.data;
   lastSave = structuredClone(toRaw(selected.value));
 
@@ -165,7 +165,7 @@ async function getOrder(order: Rdr) {
   // get price
   for (const [id, qty] of Object.entries(cart.value)) {
     cost.value += items[id].price * qty;
-    console.log(cost.value);
+    // console.log(cost.value);
   }
 }
 
@@ -232,7 +232,7 @@ async function fulfill() {
   const output = Object.entries(stocks)
     .map((item) => {
       const [id, qty] = item;
-      console.log(item);
+      // console.log(item);
       return `${items[id].name}: ${qty} → ${qty - cart.value[id]}${qty - cart.value[id] < 0 ? " (!)" : ""}`;
     })
     .sort();

@@ -12,13 +12,13 @@ export const useCartStore = defineStore("cart", () => {
   async function createCart() {
     const user = await userStore.fetchUser();
     if (!user) return;
-    console.log("creating cart");
+    // console.log("creating cart");
     // if id already has a cart this won't error. cool!
     await supabase.from("carts").insert({ user_id: user.id });
   }
 
   async function addToCart(id: string, amount: number) {
-    console.log("add");
+    // console.log("add");
     await fetchCart();
     cart.value[id] ??= 0;
     cart.value[id] += amount;
@@ -30,11 +30,11 @@ export const useCartStore = defineStore("cart", () => {
     let user = await userStore.fetchUser();
     if (!user) {
       await userStore.createAnonymousUser();
-      console.log("done1");
+      // console.log("done1");
       user = await userStore.fetchUser();
-      console.log("done2", user);
+      // console.log("done2", user);
     }
-    console.log((await supabase.auth.getSession()).data.session?.user);
+    // console.log((await supabase.auth.getSession()).data.session?.user);
 
     // eq needed because admins can see everyone's cart
     const dbCart = await supabase.from("carts").select("data").eq("user_id", user?.id);
@@ -46,11 +46,11 @@ export const useCartStore = defineStore("cart", () => {
       cart.value = dbCart.data[0].data;
     }
 
-    console.log("fetched", cart.value);
+    // console.log("fetched", cart.value);
   }
 
   async function saveCart() {
-    console.log("saving", cart.value);
+    // console.log("saving", cart.value);
     const user = await userStore.fetchUser();
     if (!user || user.aud !== "authenticated") {
       alert("You don't exist??");
@@ -64,11 +64,11 @@ export const useCartStore = defineStore("cart", () => {
     }
 
     await supabase.from("carts").update({ data: cart.value }).eq("user_id", user.id);
-    console.log("just saved", cart.value);
+    // console.log("just saved", cart.value);
   }
 
   async function placeOrder() {
-    console.log(cart.value);
+    // console.log(cart.value);
     const user = await userStore.fetchUser();
     if (!user) return;
     // @ts-ignore
@@ -82,7 +82,7 @@ export const useCartStore = defineStore("cart", () => {
 
     // if someone already has unfulfilled order, don't let them order
     // there is also a function and trigger in place for this (RLS does not play nice when you refer to the table it's on)
-    console.log(user);
+    // console.log(user);
     const { data } = await supabase.from("orders").select("user_id, status").eq("user_id", user.id);
     if (!data) return;
     if (data.filter((order) => order.status !== "fulfilled").length > 0) {

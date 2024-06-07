@@ -12,7 +12,7 @@ export const useUserStore = defineStore("user", () => {
   }
 
   const isAdmin = computed(async () => {
-    console.log("checking for admin");
+    // console.log("checking for admin");
     if (!dbUser) dbUser = (await supabase.auth.getUser()).data.user;
     if (dbUser?.aud !== "authenticated") {
       return false;
@@ -25,7 +25,7 @@ export const useUserStore = defineStore("user", () => {
   async function anonToUser() {
     // @ts-ignore
     if (dbUser && dbUser.is_anonymous) {
-      console.log("anonymous user");
+      // console.log("anonymous user");
       const { data, error } = await supabase.auth.linkIdentity({
         provider: "google",
         options: {
@@ -34,7 +34,7 @@ export const useUserStore = defineStore("user", () => {
       });
       if (data && !error) dbUser = (await supabase.auth.getUser()).data.user;
     } else {
-      console.log("no user at all");
+      // console.log("no user at all");
       await signIn();
     }
   }
@@ -57,15 +57,15 @@ export const useUserStore = defineStore("user", () => {
   async function createAnonymousUser() {
     const session = await supabase.auth.getSession();
     if (!session.data.session) {
-      console.log("NO SESSION");
+      // console.log("NO SESSION");
       const response = await supabase.auth.getUser();
       if (!response.data.user || response.error) {
-        console.log("creating anonymous user...");
+        // console.log("creating anonymous user...");
         await supabase.auth.signInAnonymously();
       }
     }
     dbUser = (await supabase.auth.getUser()).data.user;
-    console.log(dbUser);
+    // console.log(dbUser);
   }
 
   return { fetchUser, anonToUser, signIn, signOut, createAnonymousUser, isAdmin };

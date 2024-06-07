@@ -99,7 +99,7 @@ onMounted(async () => {
   if (!user.value) return;
 
   const { data } = await supabase.from("users").select("contact").eq("user_id", user.value.id);
-  console.log(data);
+  // console.log(data);
   if (data) {
     contact.value = data[0].contact;
     lastContact = contact.value;

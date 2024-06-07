@@ -70,11 +70,11 @@ onMounted(async () => {
   if (!user.value.is_anonymous) warn.value = false;
   const orders = (await supabase.from("orders").select("user_id,status").eq("user_id", user.value.id)).data;
   if (!orders) return;
-  console.log(orders);
+  // console.log(orders);
   if (orders.filter((item) => item.status !== "fulfilled").length > 0) {
     orderStatus.value = "you have an order already";
   }
-  console.log(orderStatus.value);
+  // console.log(orderStatus.value);
 });
 
 async function order() {

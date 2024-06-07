@@ -38,7 +38,7 @@ async function getItems() {
 
   {  
     const {data} = await supabase.from("items").select("stock.sum()")
-    console.log(data)
+    // console.log(data)
     // @ts-ignore that is literally how you use aggregate functions. go away typescript
     if (data) stock.value = data[0].sum;
   }
